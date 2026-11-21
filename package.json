@@ -1,0 +1,20 @@
+{
+  "name": "neko3cs-blog",
+  "type": "module",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro build && wrangler dev"
+  },
+  "dependencies": {
+    "@tailwindcss/typography": "0.5.20",
+    "@tailwindcss/vite": "4.3.5",
+    "astro": "7.4.13",
+    "tailwindcss": "4.3.5"
+  },
+  "devDependencies": {
+    "wrangler": "4.162.0"
+  }
+}
