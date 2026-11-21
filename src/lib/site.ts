@@ -16,15 +16,16 @@ export function categoryPath(name: string): string {
   return `/archive/category/${name.split('/').map(encodeURIComponent).join('/')}`;
 }
 
-/** 日本時間での年と月（2桁）。はてなのアーカイブ（/archive/2024/08）と同じ区切り */
-export function archiveKey(date: Date): { year: string; month: string } {
+/** 日本時間での年・月・日（月と日は2桁）。はてなのアーカイブ（/archive/2024/08/15）と同じ区切り */
+export function archiveKey(date: Date): { year: string; month: string; day: string } {
   const parts = new Intl.DateTimeFormat('en-CA', {
     timeZone: TIME_ZONE,
     year: 'numeric',
     month: '2-digit',
+    day: '2-digit',
   }).formatToParts(date);
   const get = (type: string) => parts.find((part) => part.type === type)?.value ?? '';
-  return { year: get('year'), month: get('month') };
+  return { year: get('year'), month: get('month'), day: get('day') };
 }
 
 /** 2023年1月19日 */

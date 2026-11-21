@@ -9,6 +9,7 @@ export type ArchiveFilter =
   | { kind: 'all' }
   | { kind: 'year'; year: string }
   | { kind: 'month'; year: string; month: string }
+  | { kind: 'day'; year: string; month: string; day: string }
   | { kind: 'category'; name: string };
 
 /**
@@ -71,6 +72,10 @@ export class ArchiveView implements OnInit {
         return entrySummaries.filter((entry) => entry.year === filter.year);
       case 'month':
         return entrySummaries.filter((entry) => entry.year === filter.year && entry.month === filter.month);
+      case 'day':
+        return entrySummaries.filter(
+          (entry) => entry.year === filter.year && entry.month === filter.month && entry.day === filter.day,
+        );
       case 'category':
         return entrySummaries.filter((entry) => entry.categories.includes(filter.name));
     }
@@ -87,6 +92,8 @@ export class ArchiveView implements OnInit {
         return `${filter.year}年の記事`;
       case 'month':
         return `${filter.year}年${Number(filter.month)}月の記事`;
+      case 'day':
+        return `${filter.year}年${Number(filter.month)}月${Number(filter.day)}日の記事`;
       case 'category':
         return filter.name;
     }

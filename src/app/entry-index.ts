@@ -10,6 +10,7 @@ export interface EntrySummary {
   categories: string[];
   year: string;
   month: string;
+  day: string;
 }
 
 // ?analog-content-list=true を付けると、Analog がビルド時に frontmatter だけを読み込む（本文は含まない）。

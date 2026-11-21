@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 
 // 型は import type で分ける。部品と同じ import 文にすると、@defer の遅延読み込みの対象から外れてブラウザに送られてしまう
-import type { ArchiveFilter } from '../../../archive-view';
-import { ArchiveView } from '../../../archive-view';
-import { injectRouteSegments } from '../../../route-segments';
+import type { ArchiveFilter } from '../../../../archive-view';
+import { ArchiveView } from '../../../../archive-view';
+import { injectRouteSegments } from '../../../../route-segments';
 
 /** /archive/2024/08 */
 @Component({

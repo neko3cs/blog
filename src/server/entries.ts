@@ -39,13 +39,14 @@ export function readEntries(): EntryMeta[] {
     .sort((a, b) => b.date.getTime() - a.date.getTime());
 }
 
-/** 記事から作られる一覧ページのパス（年別・月別・カテゴリ別） */
+/** 記事から作られる一覧ページのパス（年別・月別・日別・カテゴリ別） */
 export function archivePaths(entries: EntryMeta[]): string[] {
   const paths = new Set<string>();
   for (const entry of entries) {
-    const { year, month } = archiveKey(entry.date);
+    const { year, month, day } = archiveKey(entry.date);
     paths.add(`/archive/${year}`);
     paths.add(`/archive/${year}/${month}`);
+    paths.add(`/archive/${year}/${month}/${day}`);
     for (const category of entry.categories) {
       paths.add(categoryPath(category));
     }
