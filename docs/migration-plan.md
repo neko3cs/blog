@@ -142,7 +142,8 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 - `<title>`、`meta description`、`canonical`、`og:*` を各記事で**旧サイトと同じ値**にする
 - 公開日時（`Date`）を維持し、構造化データ（`BlogPosting`）に入れる
-- Google Analytics / Search Console の計測タグを使っていれば、同じ ID を埋め込む
+- Google Analytics は、はてなブログの head に入れていた測定 ID（`G-55DR4SK29F`）をそのまま引き継ぎ、全ページに埋め込む（対応済み）
+- 広告（Google アドセンス）は今は載せない。about の広告についての記載は、将来載せる可能性があるため残す。載せる場合は、はてなの head に入れていたアドセンスのタグを移す
 
 ### 5.5 失うもの（あらかじめ受け入れる）
 

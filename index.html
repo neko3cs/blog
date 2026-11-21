@@ -15,6 +15,19 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="/src/styles.css" />
+    <!--
+      Google tag (gtag.js)。はてなブログで使っていた測定 ID をそのまま引き継ぎ、計測を続ける。
+      ページの移動は通常のリンク（ページの再読み込み）なので、標準の設定でページビューが記録される。
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-55DR4SK29F"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-55DR4SK29F');
+    </script>
   </head>
   <body class="min-h-screen">
     <app-root></app-root>
