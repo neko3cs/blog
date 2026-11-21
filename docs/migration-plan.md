@@ -84,6 +84,12 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | プリレンダーは非同期の読み込みを待たない場合がある | 記事の読み込みを `PendingTasks.run()` で包む |
 | 記事本文までハイドレーションすると、Markdown 処理や Shiki の JS（約 540KB）がブラウザに送られる | 記事を `@defer (hydrate never)` で囲み、ブラウザでは再実行しない（`withIncrementalHydration()` が必要） |
 | `format: 'file'` 相当の出力では、canonical に `.html` が付く恐れがある（Astro の試作で発生） | canonical は記事のパスから組み立て、ビルド時の URL には頼らない |
+| `prerender.routes` の `contentDir` は、既定でサブフォルダを探さない。日付形式の記事（`entry/2020/03/30/002449`）が漏れる | 記事を読み込んでプリレンダーするルートを自分で列挙する（`src/server/entries.ts`） |
+| `@defer` で囲む部品と同じ `import` 文で型も読み込むと、その部品が遅延読み込みの対象から外れ、ブラウザに送られる | 型は `import type` で分けて読み込む |
+| 404 ページはどのURLでも同じ HTML が返るため、ブラウザで Angular を起動するとハイドレーションが合わない | `postRenderingHooks` で 404.html から JS の読み込みを取り除く |
+| Nitro は「#」などをエンコードしたままのファイル名（`C%23.html`）で書き出すが、Cloudflare はデコードした名前（`C#.html`）を探す | `postRenderingHooks` でファイル名をデコードしてから書き出す |
+| プリレンダー時、Nitro は `C%23` をもう一度エンコードして（`C%2523`）リクエストするため、ページには `C%23` が届く | カテゴリページで、受け取った名前をもう一度デコードする |
+| ビルドで出力フォルダが作り直されるため、起動中の `wrangler dev` は配信ファイルを見失う | ビルドのたびに `wrangler dev` を起動し直す（`pnpm preview` はビルドしてから起動する） |
 
 ## 4. URL マッピング方針
 
@@ -93,9 +99,10 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | `/` | トップ（記事一覧） |
 | `/about` | 同一パスで再現 |
 | `/archive`, `/archive/YYYY`, `/archive/YYYY/MM` | 同一パスで生成（静的に生成できる） |
-| `/archive/category/<名前>` | 原則は同一パスで生成。ただし `ローコード/ノーコード` は名前に `/` を含み、静的ファイルにできない → このカテゴリだけ Worker で処理するか、新パスへ 301 |
-| `/feed`, `/rss` | **同一パスで維持**（購読者が離れないように）。拡張子のないファイルになるため、`_headers` で `Content-Type` を明示する |
-| `/sitemap.xml` | 新サイトで生成し、全記事URLを含める |
+| `/archive/category/<名前>` | 同一パスで生成（`C%23`、`SQL%20Server`、`.NET` も確認済み）。ただし `ローコード/ノーコード` は、はてなの `%2F` 付きURLを Cloudflare が `/` 区切りのURL（`/archive/category/ローコード/ノーコード`）へ 307 でリダイレクトする。そのため、このカテゴリだけはリンクと canonical を `/` 区切りのURLにした |
+| `/feed`, `/rss` | **同一パスで維持**（購読者が離れないように）。拡張子のないファイルになるため、`_headers` で `Content-Type` を明示する（確認済み）。本文は要約のみで、全文は載せない |
+| `/sitemap.xml` | 新サイトで生成し、トップ・about・一覧ページと全記事のURLを含める |
+| 存在しないURL | 404 ページをステータス 404 で返す（`not_found_handling: "404-page"`） |
 | `?page=N` などのクエリ | 一覧のページ送りなので SEO 上の重要度は低い。無視してトップを返す |
 | `/entry/amp/...` | 現状でも 404 なので対応不要 |
 
@@ -160,10 +167,10 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 ### Phase 2: サイト構築
 
 - [x] Analog のプロジェクトを作成し、記事ページを実装する（試作で1件分を実装済み）
-- [ ] 一覧、アーカイブ、カテゴリ、about を実装する
-- [ ] `/feed`（Atom）と `/rss`（RSS 2.0）を Nitro のサーバールートで実装し、プリレンダーで静的ファイルにする
-- [ ] sitemap を Analog のプリレンダー設定（`prerender.sitemap`）で生成する
-- [ ] デザイン（ポートフォリオとトーンを揃える）
+- [x] トップ、記事一覧、年別・月別・カテゴリ別の一覧、about、404 を実装する
+- [x] `/feed`（Atom）と `/rss`（RSS 2.0）を Nitro のサーバールートで実装し、プリレンダーで静的ファイルにする
+- [x] sitemap を Nitro のサーバールートで生成する（載せるページを選び、記事に更新日時を付けるため、Analog の `prerender.sitemap` は使わない）
+- [x] デザイン（ポートフォリオとトーンを揃える）
 - [ ] Cloudflare Workers に `*.workers.dev` でデプロイする（この時点では本番ドメインに触れない）
 
 ### Phase 3: 検証（切り替え前）
@@ -217,7 +224,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 ## 8. 次にやること
 
 1. blogsync でエクスポートを試し、記法の分布（Markdown / はてな記法 / 見たまま）を把握する（はてなの API キーが必要）
-2. 記法の変換スクリプトを作り、全記事を `content/entry/` に取り込む
-3. 記事一覧、フィード、sitemap を実装する
+2. 記法の変換スクリプトを作り、全記事を `content/entry/` に取り込む（#4）
+3. Cloudflare Workers にデプロイして切り替える（#5）
 
 `.` を含む slug（`change-to-povo2.0-from-ahamo`）は取り込んで確認済み。拡張子と誤認されず、他の記事と同じく 200 を返し、末尾スラッシュ付きと `.html` 付きは本来のURLへリダイレクトされた。
