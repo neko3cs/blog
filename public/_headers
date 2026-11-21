@@ -1,0 +1,8 @@
+# Cloudflare Workers Static Assets のレスポンスヘッダー
+# はてなブログと同じく拡張子のないURLでフィードを提供するため、Content-Type を明示する
+
+/feed
+  Content-Type: application/atom+xml; charset=utf-8
+
+/rss
+  Content-Type: application/rss+xml; charset=utf-8

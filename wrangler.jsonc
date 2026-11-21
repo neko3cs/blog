@@ -5,6 +5,8 @@
   "assets": {
     "directory": "./dist/analog/public",
     // entry/foo.html を /entry/foo で返し、/entry/foo.html と /entry/foo/ は /entry/foo へ寄せる
-    "html_handling": "auto-trailing-slash"
+    "html_handling": "auto-trailing-slash",
+    // 存在しないURLには 404.html をステータス 404 で返す
+    "not_found_handling": "404-page"
   }
 }
