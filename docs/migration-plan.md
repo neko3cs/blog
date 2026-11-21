@@ -72,7 +72,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | `/entry/<slug>/`、`/entry/<slug>.html` | `/entry/<slug>` へ 307 |
 | 存在しないURL | 404 |
 
-`povo2.0` のように `.` を含む slug が拡張子と誤認されないかは、**プレビュー環境で必ず実機確認**します（第6章の検証スクリプトの対象）。誤認される場合は、該当パスだけ Worker でルーティングします。
+`povo2.0` のように `.` を含む slug が拡張子と誤認されないかは、`change-to-povo2.0-from-ahamo` で `wrangler dev` 上は問題ないことを確認済みです。本番の Cloudflare でも、第6章の検証スクリプトで改めて確認します。
 
 ### 3.3 Analog の実装上の注意点（試作で判明）
 
@@ -121,6 +121,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | `((脚注))` | Markdown の脚注 `[^1]` |
 | はてな記法（`>|cs|...||<` など） | Markdown のコードブロック。古い記事に多いので重点的に確認する |
 | 「見たまま」モードの記事 | 公開済み HTML から本文を抽出し、Markdown に変換する（turndown など） |
+| 本文中の `#`（h1）見出し | 1段下げて `##` にする。記事タイトルがページの h1 になるため |
 
 各記事で**変換前後の本文テキストの差分**を機械的にチェックし、文章が消えていないことを確認します。
 
@@ -146,8 +147,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ### Phase 0: 棚卸し（ベースラインの記録）
 
-- [ ] sitemap から全URLのリストを `migration/urls.txt` に保存する（今回の調査で取得済み: 98件と記事以外のページ）
-- [ ] 各URLの `title` / `canonical` / ステータスコードを CSV に記録する（切り替え後の比較用）
+- [x] sitemap の全URLと `/archive`、`/feed`、`/rss` の計103件について、ステータス・title・canonical を `migration/baseline.csv` に記録する（`pnpm baseline`。2026-11-22 に記録、すべて 200）
 - [ ] Search Console で流入の多い上位ページを確認し、重点確認リストを作る
 - [ ] MT 形式のエクスポートを取得し、バックアップとして保存する
 
@@ -168,7 +168,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ### Phase 3: 検証（切り替え前）
 
-- [ ] **URL 検証スクリプト**: `urls.txt` の全パスを `*.workers.dev` に投げて、次の4点を確認する
+- [ ] **URL 検証スクリプト**（`pnpm check:urls <URL>`、作成済み）: `migration/baseline.csv` の全パスを `*.workers.dev` に投げて、次の4点を確認する
   - ステータスが 200 であること（301/308/404 は不合格）
   - 最終URLのパスが元と完全に一致すること
   - `canonical` が `https://blog.neko3cs.net/<同じパス>` であること
@@ -207,7 +207,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | --- | --- | --- |
 | 末尾スラッシュへのリダイレクトでURLが変わる | 大 | `prerender.autoSubfolderIndex: false` で `.html` 形式で出力し、検証スクリプトで 30x を不合格にする |
 | Analog のバージョンアップで内部の挙動が変わる（3.3 の回避策が効かなくなる） | 中 | バージョンを固定し、更新時は検証スクリプトで全記事を確認する |
-| `.` を含む slug が正しく配信されない | 大（該当2記事） | プレビューで実機確認する。だめなら Worker でルーティング |
+| `.` を含む slug が正しく配信されない | 小（該当2記事。`wrangler dev` では問題なし） | 本番でも検証スクリプトで確認する。だめなら Worker でルーティング |
 | はてな記法の変換漏れで本文が崩れる | 中 | 本文テキストの差分チェックと、重点記事の目視確認 |
 | はてなを非公開にし忘れ、サブドメインで重複公開される | 中 | Phase 5 のチェックリストに入れる |
 | 画像の取りこぼし（fotolife の参照が残る） | 中 | ビルド時に `st-hatena.com` への参照が残っていたら失敗させる |
@@ -216,6 +216,8 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ## 8. 次にやること
 
-1. blogsync でエクスポートを試し、記法の分布（Markdown / はてな記法 / 見たまま）を把握する
-2. Phase 0 のベースライン記録スクリプトを作成する
-3. `.` を含む slug（`change-to-povo2.0-from-ahamo` など）の記事を取り込み、配信を確認する
+1. blogsync でエクスポートを試し、記法の分布（Markdown / はてな記法 / 見たまま）を把握する（はてなの API キーが必要）
+2. 記法の変換スクリプトを作り、全記事を `content/entry/` に取り込む
+3. 記事一覧、フィード、sitemap を実装する
+
+`.` を含む slug（`change-to-povo2.0-from-ahamo`）は取り込んで確認済み。拡張子と誤認されず、他の記事と同じく 200 を返し、末尾スラッシュ付きと `.html` 付きは本来のURLへリダイレクトされた。
