@@ -98,7 +98,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | `/entry/...`（98件） | **完全に同一パスで 200**。ここは妥協しない |
 | `/` | トップ（記事一覧） |
 | `/about` | 同一パスで再現 |
-| `/archive`, `/archive/YYYY`, `/archive/YYYY/MM` | 同一パスで生成（静的に生成できる） |
+| `/archive`, `/archive/YYYY`, `/archive/YYYY/MM`, `/archive/YYYY/MM/DD` | 同一パスで生成（静的に生成できる）。日別のアーカイブも Search Console の検索結果に載っていたため用意した |
 | `/archive/category/<名前>` | 同一パスで生成（`C%23`、`SQL%20Server`、`.NET` も確認済み）。ただし `ローコード/ノーコード` は、はてなの `%2F` 付きURLを Cloudflare が `/` 区切りのURL（`/archive/category/ローコード/ノーコード`）へ 307 でリダイレクトする。そのため、このカテゴリだけはリンクと canonical を `/` 区切りのURLにした |
 | `/feed`, `/rss` | **同一パスで維持**（購読者が離れないように）。拡張子のないファイルになるため、`_headers` で `Content-Type` を明示する（確認済み）。本文は要約のみで、全文は載せない |
 | `/sitemap.xml` | 新サイトで生成し、トップ・about・一覧ページと全記事のURLを含める |
@@ -156,7 +156,8 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 ### Phase 0: 棚卸し（ベースラインの記録）
 
 - [x] sitemap の全URLと `/archive`、`/feed`、`/rss` の計103件について、ステータス・title・canonical を `migration/baseline.csv` に記録する（`pnpm baseline`。2026-11-22 に記録、すべて 200）
-- [ ] Search Console で流入の多い上位ページを確認し、重点確認リストを作る
+- [x] Search Console で流入の多い上位ページを確認し、重点確認リストを作る（`migration/search-console-pages.csv`。直近12か月の97件。クリックの約7割が `/entry/work-with-depression-2-times-2026` に集中）
+- [x] Search Console のプロパティと所有権の確認方法を確認する（「ドメイン」プロパティ `blog.neko3cs.net` を DNS で確認済み。切り替えの対応は不要）
 - [ ] MT 形式のエクスポートを取得し、バックアップとして保存する
 
 ### Phase 1: エクスポートと変換
