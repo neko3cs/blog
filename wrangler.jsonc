@@ -1,0 +1,10 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "neko3cs-blog",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist/analog/public",
+    // entry/foo.html を /entry/foo で返し、/entry/foo.html と /entry/foo/ は /entry/foo へ寄せる
+    "html_handling": "auto-trailing-slash"
+  }
+}
