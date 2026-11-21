@@ -15,22 +15,23 @@ const SITE_URL = 'https://blog.neko3cs.net';
   selector: 'app-entry-article',
   template: `
     @if (entry(); as entry) {
-      <header class="mx-auto max-w-[820px] px-6 pt-20 pb-12 text-center md:pt-28 md:pb-16">
-        <p class="mb-5 text-sm font-semibold tracking-wide text-text-sub">
-          {{ categories().join(' · ') }}
-        </p>
-        <h1 class="apple-heading-m text-balance">{{ entry.attributes.Title }}</h1>
-        <time [attr.datetime]="publishedAt()?.toISOString()" class="mt-6 block text-sm text-text-sub">
-          {{ dateLabel() }}
-        </time>
-      </header>
+      <!-- 記事は白い背景に直接置き、見出しまわりは本文と同じ幅で左揃えにする -->
+      <article class="bg-bg-card px-6 pt-14 pb-24 md:pt-20">
+        <div class="mx-auto max-w-[692px]">
+          <header>
+            <p class="apple-eyebrow">{{ categories().join(' · ') }}</p>
+            <time [attr.datetime]="publishedAt()?.toISOString()" class="mt-1 block text-sm font-semibold text-text-sub">
+              {{ dateLabel() }}
+            </time>
+            <h1 class="mt-4 text-[28px] leading-[1.25] font-bold text-pretty md:text-[40px] md:leading-[1.2]">
+              {{ entry.attributes.Title }}
+            </h1>
+          </header>
 
-      <article class="mx-auto max-w-[860px] px-4 pb-24 md:px-6">
-        <div class="rounded-[28px] bg-bg-card px-6 py-12 md:px-16 md:py-20">
-          <div class="article-body mx-auto max-w-[692px]" [innerHTML]="html()"></div>
+          <div class="article-body mt-10 md:mt-12" [innerHTML]="html()"></div>
 
           @if (categories().length > 0) {
-            <div class="mx-auto mt-16 flex max-w-[692px] flex-wrap gap-2 border-t border-border/60 pt-8">
+            <div class="mt-16 flex flex-wrap gap-2 border-t border-border/60 pt-8">
               @for (name of categories(); track name) {
                 <a [href]="'/archive/category/' + encodeURIComponent(name)" class="apple-pill">{{ name }}</a>
               }
