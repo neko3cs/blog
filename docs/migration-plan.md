@@ -39,19 +39,51 @@
 
 | 層 | 採用案 | 理由 |
 | --- | --- | --- |
-| SSG | **Astro**（推奨）または Angular SSG | Astro は Markdown ブログ向けの Content Collections、RSS、sitemap が揃っており、記事98件規模では最も手間が少ないため。ポートフォリオと技術を揃えたい場合は Angular でも実現できる |
-| ホスティング | **Cloudflare Workers (Static Assets)** または Pages | 新規なら Workers を推奨（Pages は Workers への統合が進んでいる）。どちらでも無料枠に収まる |
+| SSG | **Analog 2.9（Angular 22）**（採用） | 作者が Angular を好んで書いており、技術者ブログとして「Angular で作ったブログ」であることに意味があるため。Astro と同じ記事ページを試作して比較したうえで決定した（3.1 参照） |
+| ホスティング | **Cloudflare Workers (Static Assets)** | 静的ファイルだけを配信する。無料枠に収まる |
 | 画像 | リポジトリ同梱（`public/images/`）または R2 | 98記事分なら同梱で十分。容量が大きくなったら R2 |
 | ソース管理 | このリポジトリ（`neko3cs/blog`） | GitHub 連携で push 時に自動デプロイ |
 
-### URL維持のための設定（最重要）
+### 3.1 SSG の選定（Astro と Analog の比較）
 
-はてなのURLは末尾スラッシュなしです。Cloudflare の静的配信は既定で `/foo/index.html` を `/foo/` へ 308 リダイレクトするため、**そのままではURLが変わってしまいます**。次のいずれかで回避します。
+画像のない記事1件（`/entry/how-to-disconnect-sql-server-db-connection`）を題材に、Astro と Analog で同じ記事ページを試作して比較した。
 
-- **案1（推奨）**: Astro を `build.format: 'file'` と `trailingSlash: 'never'` に設定し、`entry/2020/03/30/002449.html` の形で出力する。Cloudflare は `/entry/2020/03/30/002449` へのリクエストに `.html` を補って返す。
-- **案2**: ディレクトリ形式で出力し、Workers の `assets.html_handling = "drop-trailing-slash"` を設定する。
+| 観点 | Astro | Analog |
+| --- | --- | --- |
+| URL の維持 | ✅ | ✅（同じ挙動） |
+| title / description / canonical | ✅ はてなと一致 | ✅ はてなと一致 |
+| ブラウザに送る JS | ほぼ 0 | 約 300KB（転送量 約 94KB。Angular と Router の本体） |
+| コード量（設定とページ部分） | 約 190 行 | 約 320 行 |
+| 作者が読み書きしやすいか | × | ◎ |
+
+Astro はブログ向けの機能が揃っていて手間が少ないが、作者にとって読みにくい。Analog は自分で書くコードが少し増えるものの、できないことはない。ブログを自分で育て続けることを重視し、Analog を採用した。
+
+### 3.2 URL維持のための設定（最重要）
+
+はてなのURLは末尾スラッシュなしです。Cloudflare の静的配信は既定で `/foo/index.html` を `/foo/` へリダイレクトするため、**そのままではURLが変わってしまいます**。
+
+Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: false` で、`entry/2020/03/30/002449.html` の形で出力します。Workers の `assets.html_handling = "auto-trailing-slash"` により、`/entry/2020/03/30/002449` へのリクエストに `.html` を補って返します。
+
+試作で確認した挙動は次のとおりです（`wrangler dev`）。
+
+| リクエスト | 結果 |
+| --- | --- |
+| `/entry/<slug>` | 200 |
+| `/entry/<slug>/`、`/entry/<slug>.html` | `/entry/<slug>` へ 307 |
+| 存在しないURL | 404 |
 
 `povo2.0` のように `.` を含む slug が拡張子と誤認されないかは、**プレビュー環境で必ず実機確認**します（第6章の検証スクリプトの対象）。誤認される場合は、該当パスだけ Worker でルーティングします。
+
+### 3.3 Analog の実装上の注意点（試作で判明）
+
+| 注意点 | 対応 |
+| --- | --- |
+| `src/content/` 以下の Markdown は、同じパスのルートとして自動登録され、自作の `/entry/**` ページより優先される | 記事は `content/entry/` に置く。ファイルパスを はてなのURLパスと一致させる（blogsync の出力構造と同じ） |
+| catch-all ルート（`[...path].page.ts`）は親子2段のルートとして登録され、ページ自身の `ActivatedRoute` からは URL のパスが取れない | `ActivatedRoute.pathFromRoot` のすべての URL 断片を連結する |
+| Analog 2.9 は Markdown の変換とハイライトをビルド時に行い、実行時の `ContentRenderer` は何もしない。`MarkdownComponent` に Markdown を渡すと、変換前のテキストがそのまま出力される | `import.meta.glob` で `?analog-content-file=true` を付けて読み込み、ビルド時に変換済みの HTML を受け取る |
+| プリレンダーは非同期の読み込みを待たない場合がある | 記事の読み込みを `PendingTasks.run()` で包む |
+| 記事本文までハイドレーションすると、Markdown 処理や Shiki の JS（約 540KB）がブラウザに送られる | 記事を `@defer (hydrate never)` で囲み、ブラウザでは再実行しない（`withIncrementalHydration()` が必要） |
+| `format: 'file'` 相当の出力では、canonical に `.html` が付く恐れがある（Astro の試作で発生） | canonical は記事のパスから組み立て、ビルド時の URL には頼らない |
 
 ## 4. URL マッピング方針
 
@@ -85,7 +117,7 @@
 | --- | --- |
 | `[f:id:neko3cs:20240806155326p:plain]` | `![](/images/20240806/20240806155326.png)` |
 | `[https://...:embed:cite]` | リンクカードのコンポーネント、または通常のリンク |
-| `[:contents]` | 目次コンポーネント（Astro なら `remark-toc` など） |
+| `[:contents]` | 目次（見出しの一覧を Angular のコンポーネントで描画する） |
 | `((脚注))` | Markdown の脚注 `[^1]` |
 | はてな記法（`>|cs|...||<` など） | Markdown のコードブロック。古い記事に多いので重点的に確認する |
 | 「見たまま」モードの記事 | 公開済み HTML から本文を抽出し、Markdown に変換する（turndown など） |
@@ -96,7 +128,7 @@
 
 1. 全記事から fotolife の URL を抽出してダウンロードする
 2. `public/images/YYYYMMDD/<id>.<ext>` に配置し、本文の参照を書き換える
-3. はてなが生成していた OGP 画像の代わりに、記事ごとの OGP 画像を自前で生成する（`astro-og-canvas` など）か、共通画像を使う
+3. はてなが生成していた OGP 画像の代わりに、記事ごとの OGP 画像を自前で生成する（Analog の `@analogjs/content/og` など）か、共通画像を使う
 
 ### 5.4 SEO メタ情報の引き継ぎ
 
@@ -123,11 +155,14 @@
 
 - [ ] blogsync で全記事を取得する
 - [ ] 変換スクリプトで記法を変換し、画像をダウンロードする
-- [ ] Astro の Content Collection に取り込む（記事のパスは frontmatter の `URL` から決める）
+- [ ] `content/entry/<URLのパス>.md` として配置する（blogsync の出力構造をそのまま使う）
 
 ### Phase 2: サイト構築
 
-- [ ] Astro のプロジェクトを作成する（記事ページ、一覧、アーカイブ、カテゴリ、about、feed、rss、sitemap）
+- [x] Analog のプロジェクトを作成し、記事ページを実装する（試作で1件分を実装済み）
+- [ ] 一覧、アーカイブ、カテゴリ、about を実装する
+- [ ] `/feed`（Atom）と `/rss`（RSS 2.0）を Nitro のサーバールートで実装し、プリレンダーで静的ファイルにする
+- [ ] sitemap を Analog のプリレンダー設定（`prerender.sitemap`）で生成する
 - [ ] デザイン（ポートフォリオとトーンを揃える）
 - [ ] Cloudflare Workers に `*.workers.dev` でデプロイする（この時点では本番ドメインに触れない）
 
@@ -170,7 +205,8 @@
 
 | リスク | 影響 | 対策 |
 | --- | --- | --- |
-| 末尾スラッシュへのリダイレクトでURLが変わる | 大 | `build.format: 'file'` または `drop-trailing-slash` を使い、検証スクリプトで 30x を不合格にする |
+| 末尾スラッシュへのリダイレクトでURLが変わる | 大 | `prerender.autoSubfolderIndex: false` で `.html` 形式で出力し、検証スクリプトで 30x を不合格にする |
+| Analog のバージョンアップで内部の挙動が変わる（3.3 の回避策が効かなくなる） | 中 | バージョンを固定し、更新時は検証スクリプトで全記事を確認する |
 | `.` を含む slug が正しく配信されない | 大（該当2記事） | プレビューで実機確認する。だめなら Worker でルーティング |
 | はてな記法の変換漏れで本文が崩れる | 中 | 本文テキストの差分チェックと、重点記事の目視確認 |
 | はてなを非公開にし忘れ、サブドメインで重複公開される | 中 | Phase 5 のチェックリストに入れる |
@@ -180,6 +216,6 @@
 
 ## 8. 次にやること
 
-1. SSG を Astro と Angular のどちらにするか決める
-2. blogsync でエクスポートを試し、記法の分布（Markdown / はてな記法 / 見たまま）を把握する
-3. Phase 0 のベースライン記録スクリプトを作成する
+1. blogsync でエクスポートを試し、記法の分布（Markdown / はてな記法 / 見たまま）を把握する
+2. Phase 0 のベースライン記録スクリプトを作成する
+3. `.` を含む slug（`change-to-povo2.0-from-ahamo` など）の記事を取り込み、配信を確認する
