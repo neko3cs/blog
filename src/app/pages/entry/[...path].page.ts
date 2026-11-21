@@ -1,7 +1,7 @@
-import { Component, inject } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { Component } from '@angular/core';
 
 import { EntryArticle } from '../../entry-article';
+import { injectRouteSegments } from '../../route-segments';
 
 @Component({
   imports: [EntryArticle],
@@ -18,10 +18,6 @@ import { EntryArticle } from '../../entry-article';
   `,
 })
 export default class EntryPage {
-  // /entry/2020/03/30/002449 → "2020/03/30/002449"。content/entry/ 以下のファイルパスと一致する。
-  // Analog は catch-all を親子のルートに分けて登録するため、ルートからすべての URL 断片を連結する。
-  readonly path = inject(ActivatedRoute)
-    .pathFromRoot.flatMap((route) => route.snapshot.url.map((segment) => segment.path))
-    .slice(1)
-    .join('/');
+  // /entry/2020/03/30/002449 → "2020/03/30/002449"。content/entry/ 以下のファイルパスと一致する
+  readonly path = injectRouteSegments().slice(1).join('/');
 }
