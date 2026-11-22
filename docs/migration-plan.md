@@ -136,12 +136,12 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 1. 全記事から fotolife の URL を抽出してダウンロードする
 2. `public/images/YYYYMMDD/<id>.<ext>` に配置し、本文の参照を書き換える
-3. はてなが生成していた OGP 画像の代わりに、記事ごとの OGP 画像を自前で生成する（Analog の `@analogjs/content/og` など）か、共通画像を使う
+3. はてなが生成していた OGP 画像の代わりに、記事ごとの OGP 画像をビルド時に生成する（対応済み。`scripts/generate-og-images.mjs` が satori と resvg で `/og/entry/<記事のパス>.png` を作る。それ以外のページは共通の `/og/default.png`）
 
 ### 5.4 SEO メタ情報の引き継ぎ
 
 - `<title>`、`meta description`、`canonical`、`og:*` を各記事で**旧サイトと同じ値**にする
-- 公開日時（`Date`）を維持し、構造化データ（`BlogPosting`）に入れる
+- 公開日時（`Date`）を維持し、構造化データ（`BlogPosting`）に入れる（対応済み。記事ページには `BlogPosting` と、はてなと同じ構成の `BreadcrumbList`、トップページには `WebSite` を入れた。Google のリッチリザルトテストは公開URLが必要なため、切り替え前の `*.workers.dev` で確認する）
 - Google Analytics は、はてなブログの head に入れていた測定 ID（`G-55DR4SK29F`）をそのまま引き継ぎ、全ページに埋め込む（対応済み）
 - 広告（Google アドセンス）は今は載せない。about の広告についての記載は、将来載せる可能性があるため残す。載せる場合は、はてなの head に入れていたアドセンスのタグを移す
 
