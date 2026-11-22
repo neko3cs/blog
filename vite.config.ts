@@ -18,7 +18,14 @@ export default defineConfig(() => ({
       content: {
         highlighter: 'shiki',
         shikiOptions: {
-          highlighter: { themes: ['github-light'], additionalLangs: ['sql'] },
+          highlighter: {
+            themes: ['github-light'],
+            // 記事のコードブロックで使っている言語（scripts/import-hatena.mjs の LANGUAGES と揃える）
+            additionalLangs: [
+              'shellscript', 'csharp', 'cpp', 'java', 'javascript', 'python', 'sql', 'json', 'powershell',
+              'xml', 'cmake', 'qml', 'bicep', 'viml', 'latex', 'html', 'csv', 'yaml',
+            ],
+          },
           highlight: { theme: 'github-light' },
         },
       },

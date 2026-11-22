@@ -163,3 +163,6 @@ vite.config.ts.timestamp-*
 
 # Cloudflare Wrangler
 .wrangler/
+
+# はてなブログから取得した HTML（scripts/import-hatena.mjs のキャッシュ）
+migration/.cache/
