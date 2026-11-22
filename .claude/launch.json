@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "blog-preview",
+      "runtimeExecutable": "./node_modules/.bin/wrangler",
+      "runtimeArgs": ["dev", "--port", "8787", "--ip", "127.0.0.1"],
+      "port": 8787
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+/*
+ * デザイントークン。ポートフォリオサイト（neko3cs/portfolio-site）と共通。
+ * Apple のサイトの雰囲気を参考にしつつ、フォントなどで独自性を残している。
+ */
+@theme {
+  --font-sans: 'Noto Sans JP', sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --color-accent: #0066cc; /* Apple Blue */
+  --color-bg-base: #f5f5f7;
+  --color-bg-card: #ffffff;
+  --color-text-main: #1d1d1f;
+  --color-text-sub: #6e6e73; /* 白背景でコントラスト比 4.5:1 以上 */
+  --color-border: #d2d2d7;
+}
+
+@layer base {
+  body {
+    @apply bg-bg-base text-text-main font-sans selection:bg-accent/10 selection:text-accent;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* 日本語は字間を詰めると窮屈に見えるため、詰めない */
+  h1, h2, h3 {
+    @apply font-bold text-text-main;
+  }
+}
+
+@layer components {
+  .apple-section {
+    @apply max-w-300 mx-auto px-6 py-20 md:py-32;
+  }
+
+  .reveal {
+    @apply opacity-0 translate-y-10 transition-all duration-1000 ease-[cubic-bezier(0.28,0.11,0.32,1)];
+  }
+
+  .reveal.active {
+    @apply opacity-100 translate-y-0;
+  }
+
+  .apple-card {
+    @apply bg-bg-card rounded-[28px] overflow-hidden border border-transparent hover:shadow-2xl hover:shadow-black/5 transition-all duration-700;
+  }
+
+  .apple-heading-l {
+    @apply text-5xl md:text-7xl font-bold leading-[1.1];
+  }
+
+  .apple-heading-m {
+    @apply text-3xl md:text-5xl font-bold leading-tight;
+  }
+
+  .apple-link {
+    @apply text-accent hover:underline inline-flex items-center gap-1 font-medium text-lg;
+  }
+
+  .apple-pill {
+    @apply inline-flex items-center rounded-full bg-bg-base px-4 py-1.5 text-sm font-medium text-text-main transition-colors hover:bg-accent/10 hover:text-accent;
+  }
+
+  /* 記事タイトルの上に並ぶ小さなラベル（カテゴリ） */
+  .apple-eyebrow {
+    @apply text-xs font-bold text-text-sub;
+  }
+}
+
+/* ブログ独自: Markdown から生成される記事本文の組版 */
+@layer components {
+  .article-body {
+    /* prose が設定する変数を上書きするため、@apply を先に書く */
+    @apply prose max-w-none text-[17px] leading-[1.75];
+    --tw-prose-body: var(--color-text-main);
+    --tw-prose-headings: var(--color-text-main);
+    --tw-prose-links: var(--color-accent);
+    --tw-prose-bullets: var(--color-text-sub);
+    --tw-prose-code: var(--color-text-main);
+  }
+
+  .article-body h2 {
+    @apply mt-12 mb-4 text-[21px] leading-snug font-bold;
+  }
+
+  .article-body h3 {
+    @apply mt-10 mb-3 text-[19px] leading-snug font-bold;
+  }
+
+  /* 本文中のリンクは、色だけに頼らず下線でも分かるようにする */
+  .article-body a {
+    @apply font-normal underline underline-offset-2 hover:no-underline;
+  }
+
+  /* インラインコードは背景を付けず、等幅フォントだけで区別する */
+  .article-body :not(pre) > code {
+    @apply font-mono text-[0.94em] font-normal;
+  }
+
+  .article-body :not(pre) > code::before,
+  .article-body :not(pre) > code::after {
+    content: none;
+  }
+
+  /* Shiki はインラインで背景色を指定するため、カード色に合わせて上書きする */
+  .article-body pre.shiki {
+    @apply my-8 rounded-[15px] px-5 py-4 font-mono text-[15px] leading-[1.67];
+    background-color: var(--color-bg-base) !important;
+  }
+}

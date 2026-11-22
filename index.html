@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8" />
+    <title>ねこさんのぶろぐ</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="alternate" type="application/atom+xml" title="Atom" href="https://blog.neko3cs.net/feed" />
+    <link rel="alternate" type="application/rss+xml" title="RSS2.0" href="https://blog.neko3cs.net/rss" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css" />
+    <!--
+      Google tag (gtag.js)。はてなブログで使っていた測定 ID をそのまま引き継ぎ、計測を続ける。
+      ページの移動は通常のリンク（ページの再読み込み）なので、標準の設定でページビューが記録される。
+    -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-55DR4SK29F"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag('js', new Date());
+      gtag('config', 'G-55DR4SK29F');
+    </script>
+  </head>
+  <body class="min-h-screen">
+    <app-root></app-root>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
