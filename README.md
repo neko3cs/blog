@@ -43,6 +43,10 @@ pnpm preview
 
 画像は `public/images/<日付>/` に置き、本文からは `/images/<日付>/<ファイル名>` で参照します。
 
+### 埋め込み
+
+YouTube・SlideShare・Speaker Deck は、各サービスの「埋め込む」でコピーした `<iframe>` の HTML を、Markdown にそのまま貼ります。スマホでは画面幅に縮み、YouTube は 16:9 の比率を保ちます。
+
 ### 下書き
 
 公開しない下書きは `content/drafts/` に置きます。`content/entry/` の外なので、ビルドの対象にならず、サイトにも sitemap にも出ません。
