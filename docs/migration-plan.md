@@ -110,32 +110,45 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ## 5. 記事データの取り出しと変換
 
-### 5.1 エクスポート
+### 5.1 取り出し方（公開ページの HTML から変換）
 
-- **第一候補: [blogsync](https://github.com/x-motemen/blogsync)**（はてなブログ AtomPub API のクライアント）
-  - 記事を**書いたときの記法のまま**（Markdown / はてな記法）取得できる
-  - frontmatter に `URL`、`Date`、`Category`、`Draft`、`EditURL` が入る。**URL の情報をそのまま新サイトのパスに使える**
-  - 出力されるファイルパスがURL構造と一致する（`entry/2020/03/30/002449.md`）
-- 補助: 管理画面の「エクスポート」（Movable Type 形式）。HTML 本文とコメントを含むので、バックアップとして必ず取っておく。
+当初は [blogsync](https://github.com/x-motemen/blogsync)（はてなの AtomPub API）で原稿を取得する予定だったが、**公開ページの HTML から変換する方法**に変更した（Issue #4）。
 
-### 5.2 記法の変換（スクリプトで一括処理）
+- はてなの API キーが不要
+- Markdown・はてな記法・見たまま、どの書き方で書いた記事も公開ページの HTML は同じ形式なので、**1つの変換で全記事を扱える**
+- 変換結果が「読者が見ていた内容」と一致するので、照合しやすい
+- 代わりに、Markdown は HTML から作り直したものになり、元の原稿とは細部の書き方が変わる（表示の内容は同じ）
+- 下書きと限定公開の記事は公開ページがないため取得できない（URL を維持する必要もない）
 
-| はてな独自の記法 | 変換後 |
+取得漏れがないことは、sitemap（98件）と、はてなの記事一覧ページ（`/archive?page=N`、98件）を照合して確認した。about ページの「ブログ投稿数 98 記事」とも一致する。
+
+`pnpm import:hatena`（`scripts/import-hatena.mjs`）が、`migration/baseline.csv` の全記事の HTML を取得し（`migration/.cache/html/` に保存。Git の管理外）、`content/entry/<URLのパス>.md` に書き出す。frontmatter は blogsync と同じ形式（`Title`・`Category`・`Date`・`URL`）。
+
+### 5.2 変換の規則
+
+| はてなの HTML | 変換後 |
 | --- | --- |
-| `[f:id:neko3cs:20240806155326p:plain]` | `![](/images/20240806/20240806155326.png)` |
-| `[https://...:embed:cite]` | リンクカードのコンポーネント、または通常のリンク |
-| `[:contents]` | 目次（見出しの一覧を Angular のコンポーネントで描画する） |
-| `((脚注))` | Markdown の脚注 `[^1]` |
-| はてな記法（`>|cs|...||<` など） | Markdown のコードブロック。古い記事に多いので重点的に確認する |
-| 「見たまま」モードの記事 | 公開済み HTML から本文を抽出し、Markdown に変換する（turndown など） |
-| 本文中の `#`（h1）見出し | 1段下げて `##` にする。記事タイトルがページの h1 になるため |
+| はてなキーワードの自動リンク | 文字だけ残す |
+| コードブロック（`pre.code`） | 言語付きのコードブロック。言語名は Shiki の名前に揃える（`sh`→`shellscript` など） |
+| フォトライフの画像 | ダウンロードして `public/images/<日付>/` に置く。キャプション付き（`figure`）は HTML の `figure` で残す |
+| はてなのリンクカード | 記事タイトル付きのリンク。直後の引用元表記（`hatena-citation`）は取り除く |
+| SlideShare・Speaker Deck | iframe のまま残し、元の縦横比を `aspect-ratio` で指定する |
+| X（Twitter）の埋め込み | 引用（blockquote）として本文を残す。読み込み用のスクリプトは取り除く |
+| 脚注 | はてなと同じ「*1」形式で、本文の参照と注を相互にリンクする（marked が Markdown の脚注に対応していないため HTML で書く） |
+| 目次 | 取り除く（1記事のみ） |
+| Gist | Gist へのリンク（1記事のみ） |
+| 見出し | 本文に h1 がある記事は、記事タイトル（ページの h1）と重ならないよう1段ずつ下げる |
+| 自分のブログへのリンク | サイト内のパス（`/entry/…`） |
+| 本文中の `<` と `~` | エスケープする（`IEnumerable<T>` の `<T>` がタグとして消える、`~です~` が取り消し線になるのを防ぐ） |
+| 太字・斜体 | 内側の端が記号のときは HTML の `<strong>`・`<em>` にする（Markdown の仕様では `**『…』**です` が太字にならないため） |
+| タイトル | 前後の空白も残す（末尾に空白のある記事があり、はてなの title と完全に一致させるため） |
 
-各記事で**変換前後の本文テキストの差分**を機械的にチェックし、文章が消えていないことを確認します。
+`pnpm check:content`（`scripts/check-content.mjs`）で、**はてなの本文の文がすべて新サイトの本文にあるか**を全記事で照合する（98記事で見つからない文 0件を確認済み）。
 
 ### 5.3 画像
 
-1. 全記事から fotolife の URL を抽出してダウンロードする
-2. `public/images/YYYYMMDD/<id>.<ext>` に配置し、本文の参照を書き換える
+1. 本文のフォトライフの画像（91枚、約11MB）をダウンロードし、`public/images/YYYYMMDD/<id>.<ext>` に置いた（対応済み）
+2. Zenn など外部に置いた画像（3枚）は、元のURLのまま参照する
 3. はてなが生成していた OGP 画像の代わりに、記事ごとの OGP 画像をビルド時に生成する（対応済み。`scripts/generate-og-images.mjs` が satori と resvg で `/og/entry/<記事のパス>.png` を作る。それ以外のページは共通の `/og/default.png`）
 
 ### 5.4 SEO メタ情報の引き継ぎ
@@ -149,7 +162,8 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 - はてなスター、はてなブックマーク数の表示（ブクマ自体はURLが同じなので残る）
 - 読者登録（はてなの購読機能）。RSS 購読は `/feed`、`/rss` を維持すれば続く
-- コメント。MT エクスポートから静的 HTML として残すか、捨てるかを決める
+- コメント。移行しない（新サイトにコメント機能がないため）。必要なら MT エクスポートから静的 HTML として残す
+- 表の列の揃え（中央揃えなど）。内容は同じだが、左揃えで表示される
 
 ## 6. 移行手順
 
@@ -162,9 +176,12 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ### Phase 1: エクスポートと変換
 
-- [ ] blogsync で全記事を取得する
-- [ ] 変換スクリプトで記法を変換し、画像をダウンロードする
-- [ ] `content/entry/<URLのパス>.md` として配置する（blogsync の出力構造をそのまま使う）
+- [x] 全98記事の公開ページの HTML を取得する（`pnpm import:hatena`）
+- [x] 変換スクリプトで Markdown に変換し、画像をダウンロードする
+- [x] `content/entry/<URLのパス>.md` として配置する
+- [x] 本文の文章が欠けていないことを照合する（`pnpm check:content`。見つからない文 0件）
+- [x] はてなの全URL（103件）が新サイトでも一致することを確認する（`pnpm check:urls`。title・canonical まで一致）
+- [x] 全ページ（329件）がスマホ幅で横にはみ出さないことを確認する
 
 ### Phase 2: サイト構築
 
@@ -217,16 +234,15 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | 末尾スラッシュへのリダイレクトでURLが変わる | 大 | `prerender.autoSubfolderIndex: false` で `.html` 形式で出力し、検証スクリプトで 30x を不合格にする |
 | Analog のバージョンアップで内部の挙動が変わる（3.3 の回避策が効かなくなる） | 中 | バージョンを固定し、更新時は検証スクリプトで全記事を確認する |
 | `.` を含む slug が正しく配信されない | 小（該当2記事。`wrangler dev` では問題なし） | 本番でも検証スクリプトで確認する。だめなら Worker でルーティング |
-| はてな記法の変換漏れで本文が崩れる | 中 | 本文テキストの差分チェックと、重点記事の目視確認 |
+| 変換漏れで本文が崩れる | 小（全98記事で照合済み） | `pnpm check:content` で本文の文を全記事照合し、重点記事を目視で確認した |
 | はてなを非公開にし忘れ、サブドメインで重複公開される | 中 | Phase 5 のチェックリストに入れる |
-| 画像の取りこぼし（fotolife の参照が残る） | 中 | ビルド時に `st-hatena.com` への参照が残っていたら失敗させる |
+| 画像の取りこぼし（fotolife の参照が残る） | 小（対応済み） | 取り込み後の Markdown に `st-hatena.com` への参照が0件であることを確認した |
+| SlideShare・Speaker Deck の埋め込みが表示されない | 小（13件） | ローカルのプレビューでは空白だった（外部への接続の都合と考えている）。切り替え前に `*.workers.dev` で確認する |
 | `/` を含むカテゴリURL | 小 | Worker で処理するか、301 で逃がす |
 | RSS 購読者が離れる | 小 | `/feed`、`/rss` を同じパスで維持する |
 
 ## 8. 次にやること
 
-1. blogsync でエクスポートを試し、記法の分布（Markdown / はてな記法 / 見たまま）を把握する（はてなの API キーが必要）
-2. 記法の変換スクリプトを作り、全記事を `content/entry/` に取り込む（#4）
-3. Cloudflare Workers にデプロイして切り替える（#5）
+1. Cloudflare Workers にデプロイして切り替える（#5）
 
 `.` を含む slug（`change-to-povo2.0-from-ahamo`）は取り込んで確認済み。拡張子と誤認されず、他の記事と同じく 200 を返し、末尾スラッシュ付きと `.html` 付きは本来のURLへリダイレクトされた。
