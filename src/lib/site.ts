@@ -7,6 +7,17 @@ export const SITE_AUTHOR = 'neko3cs';
 
 const TIME_ZONE = 'Asia/Tokyo';
 
+/** OGP 画像の大きさ（X や Facebook で大きく表示される推奨サイズ） */
+export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
+
+/**
+ * OGP 画像のパス。記事は記事ごとの画像（/og/entry/foo.png）、それ以外はサイト共通の画像。
+ * 画像は scripts/generate-og-images.mjs がビルド後に作る。
+ */
+export function ogImagePath(articlePath?: string): string {
+  return articlePath ? `/og${articlePath}.png` : '/og/default.png';
+}
+
 /**
  * はてなブログと同じく、カテゴリ名をパーセントエンコードする（例: C# → /archive/category/C%23）。
  * ただし「/」を含むカテゴリ名（ローコード/ノーコード）は、「/」をパスの区切りのまま残す。

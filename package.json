@@ -5,8 +5,8 @@
   "private": true,
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite build && wrangler dev",
+    "build": "vite build && node scripts/generate-og-images.mjs",
+    "preview": "pnpm build && wrangler dev",
     "baseline": "node scripts/record-baseline.mjs",
     "check:urls": "node scripts/check-urls.mjs"
   },
@@ -36,8 +36,11 @@
     "@angular/build": "^22.0.0",
     "@angular/cli": "^22.0.0",
     "@angular/compiler-cli": "^22.0.0",
+    "@fontsource/noto-sans-jp": "5.3.1",
+    "@resvg/resvg-js": "2.6.2",
     "@tailwindcss/typography": "0.5.20",
     "@tailwindcss/vite": "4.3.5",
+    "satori": "0.63.2",
     "tailwindcss": "4.3.5",
     "typescript": "~6.0.0",
     "vite": "^8.0.0",
