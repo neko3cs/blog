@@ -77,6 +77,13 @@
     --tw-prose-links: var(--color-accent);
     --tw-prose-bullets: var(--color-text-sub);
     --tw-prose-code: var(--color-text-main);
+    /* 長いURLやファイルパスなど、折り返せない文字列でスマホの画面からはみ出さないようにする */
+    overflow-wrap: anywhere;
+  }
+
+  /* 列の多い表は、ページ全体ではなく表だけを横にスクロールさせる */
+  .article-body table {
+    @apply block overflow-x-auto;
   }
 
   .article-body h2 {
@@ -100,6 +107,25 @@
   .article-body :not(pre) > code::before,
   .article-body :not(pre) > code::after {
     content: none;
+  }
+
+  /* はてなから取り込んだ画像のキャプション */
+  .article-body figure {
+    @apply my-8;
+  }
+
+  .article-body figcaption {
+    @apply mt-2 text-center text-sm text-text-sub;
+  }
+
+  /* SlideShare・Speaker Deck などの埋め込み。幅が固定なので、スマホでは画面幅に収める */
+  .article-body .embed {
+    @apply my-8;
+  }
+
+  /* 縦横比は取り込み時に iframe の style（aspect-ratio）で指定している */
+  .article-body .embed iframe {
+    @apply h-auto max-w-full;
   }
 
   /* Shiki はインラインで背景色を指定するため、カード色に合わせて上書きする */
