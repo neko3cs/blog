@@ -128,6 +128,17 @@
     @apply h-auto max-w-full;
   }
 
+  /* 記事に直接貼った埋め込み（YouTube の「埋め込む」でコピーした HTML など）も画面幅に収める */
+  .article-body iframe {
+    @apply max-w-full;
+  }
+
+  .article-body iframe[src*='youtube.com/embed'],
+  .article-body iframe[src*='youtube-nocookie.com/embed'] {
+    @apply h-auto w-full;
+    aspect-ratio: 16 / 9;
+  }
+
   /* Shiki はインラインで背景色を指定するため、カード色に合わせて上書きする */
   .article-body pre.shiki {
     @apply my-8 rounded-[15px] px-5 py-4 font-mono text-[15px] leading-[1.67];
