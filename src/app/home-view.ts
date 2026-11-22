@@ -4,6 +4,7 @@ import { EntryList } from './entry-list';
 import { entrySummaries } from './entry-index';
 import { injectSeo } from './seo';
 import { SITE_TITLE } from '../lib/site';
+import { websiteJsonLd } from '../lib/structured-data';
 
 const LATEST_COUNT = 10;
 
@@ -40,6 +41,6 @@ export class HomeView implements OnInit {
   protected readonly total = entrySummaries.length;
 
   ngOnInit(): void {
-    this.applySeo({ path: '/' });
+    this.applySeo({ path: '/', jsonLd: [websiteJsonLd()] });
   }
 }

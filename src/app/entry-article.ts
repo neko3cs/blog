@@ -4,7 +4,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Entry, loadEntry } from './entries';
 import { injectSeo } from './seo';
 import { toDescriptionFromHtml } from '../lib/description';
-import { categoryPath, formatDate } from '../lib/site';
+import { categoryPath, formatDate, ogImagePath } from '../lib/site';
+import { blogPostingJsonLd, breadcrumbJsonLd } from '../lib/structured-data';
 
 /**
  * 記事本文。親ページの @defer (hydrate never) の中でだけ使い、
@@ -72,12 +73,18 @@ export class EntryArticle implements OnInit {
       }
       // 自分のリポジトリの Markdown からビルド時に生成した HTML なので、そのまま信頼して埋め込む
       this.html.set(this.sanitizer.bypassSecurityTrustHtml(entry.html));
-      this.applySeo({
+      const article = {
         title: entry.attributes.Title,
         path: `/entry/${this.path()}`,
         description: toDescriptionFromHtml(entry.html),
-        type: 'article',
         publishedTime: new Date(entry.attributes.Date),
+        categories: entry.attributes.Category ?? [],
+      };
+      this.applySeo({
+        ...article,
+        type: 'article',
+        image: ogImagePath(article.path),
+        jsonLd: [blogPostingJsonLd(article), breadcrumbJsonLd(article)],
       });
       this.entry.set(entry);
     });
