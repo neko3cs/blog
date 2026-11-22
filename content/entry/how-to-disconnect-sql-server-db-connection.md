@@ -1,9 +1,9 @@
 ---
 Title: T-SQLで特定DBへの接続をすべて切断する
 Category:
-- SQL
 - SQL Server
 - T-SQL
+- SQL
 Date: 2023-01-19T19:46:26+09:00
 URL: https://blog.neko3cs.net/entry/how-to-disconnect-sql-server-db-connection
 ---
@@ -50,6 +50,6 @@ SQL Serverへの接続はセッションという形で保持されています�
 
 ## 参考記事
 
-- [sys.dm_exec_sessions (Transact-SQL) - SQL Server | Microsoft Learn](https://learn.microsoft.com/ja-jp/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sessions-transact-sql?view=sql-server-ver16)
-- [sys.dm_exec_connections (Transact-SQL) - SQL Server | Microsoft Learn](https://learn.microsoft.com/ja-jp/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-connections-transact-sql?view=sql-server-ver16)
+- [sys.dm\_exec\_sessions (Transact-SQL) - SQL Server | Microsoft Learn](https://learn.microsoft.com/ja-jp/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-sessions-transact-sql?view=sql-server-ver16)
+- [sys.dm\_exec\_connections (Transact-SQL) - SQL Server | Microsoft Learn](https://learn.microsoft.com/ja-jp/sql/relational-databases/system-dynamic-management-views/sys-dm-exec-connections-transact-sql?view=sql-server-ver16)
 - [KILL (Transact-SQL) - SQL Server | Microsoft Learn](https://learn.microsoft.com/ja-jp/sql/t-sql/language-elements/kill-transact-sql?view=sql-server-ver16)

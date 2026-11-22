@@ -40,3 +40,32 @@ pnpm preview
 | `/entry/how-to-disconnect-sql-server-db-connection` | `content/entry/how-to-disconnect-sql-server-db-connection.md` |
 
 `src/content/` には置かないでください。Analog が Markdown を自動でルートとして登録し、記事ページより優先されてしまいます。
+
+画像は `public/images/<日付>/` に置き、本文からは `/images/<日付>/<ファイル名>` で参照します。
+
+### 埋め込み
+
+YouTube・SlideShare・Speaker Deck は、各サービスの「埋め込む」でコピーした `<iframe>` の HTML を、Markdown にそのまま貼ります。スマホでは画面幅に縮み、YouTube は 16:9 の比率を保ちます。
+
+### 下書き
+
+公開しない下書きは `content/drafts/` に置きます。`content/entry/` の外なので、ビルドの対象にならず、サイトにも sitemap にも出ません。
+
+公開するときは、frontmatter に `Date` と `URL` を足し、`Draft: true` を消して、URL と同じパスで `content/entry/` に移します。本文の見出しは `##` から始めます（`#` は記事タイトルに使われるため）。
+
+## 移行用のスクリプト
+
+| コマンド | 内容 |
+| --- | --- |
+| `pnpm import:hatena` | はてなブログの公開ページから全記事を取り込み、`content/entry/` に Markdown で書き出す。画像も `public/images/` にダウンロードする |
+| `pnpm baseline` | はてなブログの全URLのステータス・title・canonical を `migration/baseline.csv` に記録する |
+| `pnpm check:urls <URL>` | 記録した全URLを新サイトに問い合わせ、はてなと同じ title・canonical で返るかを確認する |
+| `pnpm check:content` | ビルドした記事の本文に、はてなの本文の文がすべて含まれているかを確認する |
+
+```bash
+pnpm preview
+```
+
+```bash
+pnpm check:urls http://localhost:8787
+```
