@@ -253,9 +253,12 @@ function shiftHeadings(body) {
   return body.replace(/<(\/?)h([1-5])(?=[\s>])/g, (_, slash, level) => `<${slash}h${Number(level) + 1}`);
 }
 
-/** 自分のブログへの絶対URLを、サイト内のパスにする */
+/**
+ * 自分のブログへの絶対URLを、サイト内のパスにする。
+ * 独自ドメインにする前のURL（neko3cs.hatenablog.com）も、はてなを非公開にするとリンク切れになるため同じく変える
+ */
 function relativizeLinks(markdown) {
-  return markdown.replace(/\]\(https?:\/\/blog\.neko3cs\.net\//g, '](/');
+  return markdown.replace(/\]\(https?:\/\/(?:blog\.neko3cs\.net|neko3cs\.hatenablog\.com)\//g, '](/');
 }
 
 /** YAML の値として、そのままでは誤解される文字列だけを引用符で囲む */
