@@ -172,7 +172,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 - [x] sitemap の全URLと `/archive`、`/feed`、`/rss` の計103件について、ステータス・title・canonical を `migration/baseline.csv` に記録する（`pnpm baseline`。2026-11-22 に記録、すべて 200）
 - [x] Search Console で流入の多い上位ページを確認し、重点確認リストを作る（`migration/search-console-pages.csv`。直近12か月の97件。クリックの約7割が `/entry/work-with-depression-2-times-2026` に集中）
 - [x] Search Console のプロパティと所有権の確認方法を確認する（「ドメイン」プロパティ `blog.neko3cs.net` を DNS で確認済み。切り替えの対応は不要）
-- [ ] MT 形式のエクスポートを取得し、バックアップとして保存する
+- [ ] MT 形式のエクスポートを取得し、バックアップとして保存する（今は不要。はてなのアカウントを残すあいだは、はてなの管理画面に原稿・下書き・コメントが残る。**はてなブログやアカウントを削除する前**に取る）
 
 ### Phase 1: エクスポートと変換
 
@@ -239,8 +239,8 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 - [x] Search Console に新しい `sitemap.xml` を送信する（プロパティは同じドメインなのでそのまま使える）。2026-11-23 に送信し、検出329件。はてなの旧 `sitemap_index.xml` は同日に削除した
 - [x] 主要記事を「URL検査」でインデックス登録をリクエストする（2026-11-23、流入1位の `work-with-depression-2-times-2026`。優先クロールキューに追加された）
-- [ ] Search Console のカバレッジと、Cloudflare の 404 ログを2〜4週間監視する
-- [ ] 検索順位と表示回数を切り替え前と比べる
+- [ ] Search Console のカバレッジと、Cloudflare の 404 ログを4週間（〜2026-12-21）監視する。記録は [post-migration-monitoring.md](./post-migration-monitoring.md)、進捗は #17
+- [ ] 検索順位と表示回数を切り替え前と比べる（同上）
 - [x] ポートフォリオサイトの「Blog」リンクの表記を「はてなブログ」から変更する（2026-11-23 に確認。もともと独自ドメイン `blog.neko3cs.net` へのリンクで、表記も変える必要がなかったので、変更は不要）
 
 ## 7. リスクと対策
