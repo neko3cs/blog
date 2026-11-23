@@ -212,13 +212,20 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ### Phase 4: 切り替え（DNS スイッチ）
 
-1. DNS の TTL がすでに 300 秒であることを確認する（現状 300 のため変更不要）
-2. Cloudflare ダッシュボードで、既存の `blog` CNAME（→ `hatenablog.com`）を削除し、すぐに Worker のカスタムドメインに `blog.neko3cs.net` を追加する
-3. 本番ドメインに対して Phase 3 の検証スクリプトを再実行する
-4. プレビュー用の `noindex` が本番に残っていないことを確認する（3. の検証スクリプトで確認できる）
-5. はてなの独自ドメインの設定は**外さない**。設定があるあいだ、はてなのサブドメイン（`neko3cs.hatenablog.com`）は `blog.neko3cs.net` へ 301 でリダイレクトする（2026-11-23 に確認）。DNS が新サイトを向けば、はてなには `blog.neko3cs.net` へのリクエストが届かないので、URL は衝突しない。外すとサブドメインで記事が公開され、重複コンテンツになる
+2026-11-23 に切り替えた。CNAME を削除してカスタムドメインを追加する方法だと、証明書の発行まで一時的につながらなくなる恐れがある。そのため、**既存の CNAME のプロキシをオンにし、Worker のルートで受ける方法**にした。`*.neko3cs.net` の証明書はすでにあるので、つながらない時間が出ない。
+
+1. [x] `wrangler.jsonc` に `blog.neko3cs.net/*` のルートを追加してデプロイする（プロキシがオフのあいだは効かない。はてなが応答し続けることを確認した）
+2. [x] Cloudflare ダッシュボードで、`blog` の CNAME（→ `hatenablog.com`）の **Proxy status をオン**にする。この時点から Worker が応答する
+3. [x] 本番ドメインに対して Phase 3 の検証スクリプトを再実行する（`pnpm check:urls https://blog.neko3cs.net`。103件すべて一致）
+4. [x] プレビュー用の `noindex` が本番に残っていないことを確認する（3. の検証スクリプトで確認した）
+5. [x] そのほかに確認したこと：`/feed`・`/rss` の Content-Type、存在しないURLの 404、`http://` から `https://` への 301、`neko3cs.hatenablog.com` から新サイトへの 301
+6. はてなの独自ドメインの設定は**外さない**。設定があるあいだ、はてなのサブドメイン（`neko3cs.hatenablog.com`）は `blog.neko3cs.net` へ 301 でリダイレクトする（2026-11-23 に確認）。DNS が新サイトを向けば、はてなには `blog.neko3cs.net` へのリクエストが届かないので、URL は衝突しない。外すとサブドメインで記事が公開され、重複コンテンツになる
 
 切り替え中は、旧サイトも新サイトも同じURLで同じ内容を返します。**ダウンタイムも 404 も発生しません。**
+
+**戻し方**: 問題があれば、`blog` の CNAME のプロキシをオフに戻す。すぐに、はてなからの配信に戻る。
+
+**あとで片付けること**: CNAME の向き先として `hatenablog.com` が残っている（プロキシがオンなので、はてなにはアクセスが届かない）。はてなを非公開にしたあと、Worker のカスタムドメインに移すか、向き先をダミーのレコードに替える。`www.neko3cs.net` も `CNAME hatenablog.com` のまま使われていなかった。ほかの人がはてなで独自ドメインに設定すると乗っ取られる恐れがあるため、2026-11-23 に削除した。
 
 ### Phase 5: はてな側の後処理
 
@@ -252,6 +259,9 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ## 8. 次にやること
 
-1. Cloudflare Workers にデプロイして切り替える（#5）
+1. ~~Cloudflare Workers にデプロイして切り替える（#5）~~（2026-11-23 に切り替えた）
+2. Search Console に sitemap を送信し、2〜4週間監視する（Phase 6）
+3. 新サイトが1〜2週間安定したら、はてなブログを非公開にし、Pro の自動更新を止める（Phase 5）
+4. 新サイトが1〜2週間安定したら、`blog` の CNAME の向き先（`hatenablog.com`）を片付ける
 
 `.` を含む slug（`change-to-povo2.0-from-ahamo`）は取り込んで確認済み。拡張子と誤認されず、他の記事と同じく 200 を返し、末尾スラッシュ付きと `.html` 付きは本来のURLへリダイレクトされた。
