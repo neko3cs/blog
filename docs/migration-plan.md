@@ -206,7 +206,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
   - Speaker Deck の埋め込みとリンクカードのある記事（`join-report-of-codeer-lowcode-blazor`）: 埋め込みが 16:9 で表示される
   - 流入1位の `work-with-depression-2-times-2026`: スマホ幅（375px）で横にはみ出さない
 - [x] プレビュー環境は `noindex` にして、重複コンテンツとしてクロールされないようにする（`public/_headers` で `*.workers.dev` のホストにだけ `X-Robots-Tag: noindex` を付ける。本番のホストには付かないので、切り替え時に外す作業はない）
-- [ ] Google のリッチリザルトテストで、記事ページの構造化データを確認する
+- [x] Google のリッチリザルトテストで、記事ページの構造化データを確認する（2026-11-23、本番の `work-with-depression-2-times-2026` で「記事」と「パンくずリスト」が1件ずつ有効）
 
 > Node の `fetch` はプロキシの環境変数を見ないため、プロキシ越しに検証するときは `NODE_USE_ENV_PROXY=1 pnpm check:urls <URL>` とする。
 
@@ -237,8 +237,8 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ### Phase 6: 切り替え後の監視
 
-- [ ] Search Console に新しい `sitemap.xml` を送信する（プロパティは同じドメインなのでそのまま使える）
-- [ ] 主要記事を「URL検査」でインデックス登録をリクエストする
+- [x] Search Console に新しい `sitemap.xml` を送信する（プロパティは同じドメインなのでそのまま使える）。2026-11-23 に送信し、検出329件。はてなの旧 `sitemap_index.xml` は同日に削除した
+- [x] 主要記事を「URL検査」でインデックス登録をリクエストする（2026-11-23、流入1位の `work-with-depression-2-times-2026`。優先クロールキューに追加された）
 - [ ] Search Console のカバレッジと、Cloudflare の 404 ログを2〜4週間監視する
 - [ ] 検索順位と表示回数を切り替え前と比べる
 - [ ] ポートフォリオサイトの「Blog」リンクの表記を「はてなブログ」から変更する
