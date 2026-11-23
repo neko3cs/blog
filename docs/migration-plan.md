@@ -225,7 +225,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 **戻し方**: 問題があれば、`blog` の CNAME のプロキシをオフに戻す。すぐに、はてなからの配信に戻る。
 
-**あとで片付けること**: CNAME の向き先として `hatenablog.com` が残っている（プロキシがオンなので、はてなにはアクセスが届かない）。はてなを非公開にしたあと、Worker のカスタムドメインに移すか、向き先をダミーのレコードに替える。`www.neko3cs.net` も `CNAME hatenablog.com` のまま使われていない（HTTPS ではつながらない）ので、あわせて削除を検討する。
+**あとで片付けること**: CNAME の向き先として `hatenablog.com` が残っている（プロキシがオンなので、はてなにはアクセスが届かない）。はてなを非公開にしたあと、Worker のカスタムドメインに移すか、向き先をダミーのレコードに替える。`www.neko3cs.net` も `CNAME hatenablog.com` のまま使われていなかった。ほかの人がはてなで独自ドメインに設定すると乗っ取られる恐れがあるため、2026-11-23 に削除した。
 
 ### Phase 5: はてな側の後処理
 
@@ -262,5 +262,6 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 1. ~~Cloudflare Workers にデプロイして切り替える（#5）~~（2026-11-23 に切り替えた）
 2. Search Console に sitemap を送信し、2〜4週間監視する（Phase 6）
 3. 新サイトが1〜2週間安定したら、はてなブログを非公開にし、Pro の自動更新を止める（Phase 5）
+4. 新サイトが1〜2週間安定したら、`blog` の CNAME の向き先（`hatenablog.com`）を片付ける
 
 `.` を含む slug（`change-to-povo2.0-from-ahamo`）は取り込んで確認済み。拡張子と誤認されず、他の記事と同じく 200 を返し、末尾スラッシュ付きと `.html` 付きは本来のURLへリダイレクトされた。
