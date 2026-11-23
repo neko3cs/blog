@@ -166,3 +166,6 @@ vite.config.ts.timestamp-*
 
 # はてなブログから取得した HTML（scripts/import-hatena.mjs のキャッシュ）
 migration/.cache/
+
+# Cloudflare Workers のローカル実行用の環境変数（workers/cms-auth）
+.dev.vars
