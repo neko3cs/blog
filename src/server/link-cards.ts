@@ -57,8 +57,10 @@ function cardHtml(href: string, title: string, card: Omit<LinkCard, 'title'>): s
   const image = card.image
     ? `<img class="link-card-image" src="${escapeHtml(card.image)}" alt="" width="200" height="200" loading="lazy">`
     : '';
+  // はてなのリンクカードと同じく、外部のサイトは新しいタブで開く（サイト内の記事は同じタブで開く）
+  const target = href.startsWith('/') ? '' : ' target="_blank" rel="noopener"';
   return (
-    `<a class="link-card" href="${escapeHtml(href)}">` +
+    `<a class="link-card" href="${escapeHtml(href)}"${target}>` +
     '<span class="link-card-body">' +
     `<span class="link-card-title">${escapeHtml(title)}</span>` +
     // タイトルをそのまま説明にしているページもあるため、同じなら出さない
@@ -99,8 +101,14 @@ export function linkCardsExtension(): MarkedExtension {
         }
         // 埋め込みのコードに付く計測用のパラメーター（?ref_src=twsrc%5Etfw）は外す
         const tweetLink = { ...link, href: link.href.replace(/\?.*$/, '') };
-        const body = this.parser.parse(token.tokens.slice(0, -1));
-        const footer = this.parser.parseInline([...(attribution.tokens ?? []).slice(0, -1), tweetLink]);
+        // 投稿の中のリンク（t.co・ハッシュタグ）と日付のリンクは、リンクカードと同じく新しいタブで開く。
+        // 日付のリンク（tweet-card-link）は CSS でカード全体に広げ、カードのどこをクリックしても投稿を開けるようにする
+        const newTab = (html: string) => html.replace(/<a href=/g, '<a target="_blank" rel="noopener" href=');
+        const body = newTab(this.parser.parse(token.tokens.slice(0, -1)));
+        const footer = newTab(this.parser.parseInline([...(attribution.tokens ?? []).slice(0, -1), tweetLink])).replace(
+          /<a target="_blank" rel="noopener" href="([^"]*)">(?![\s\S]*<a )/,
+          '<a class="tweet-card-link" target="_blank" rel="noopener" href="$1">',
+        );
         return (
           '<figure class="tweet-card">' +
           '<p class="tweet-card-label">X（Twitter）の投稿</p>' +

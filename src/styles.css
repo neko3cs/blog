@@ -166,7 +166,17 @@
 
   /* X の投稿。公式の埋め込み（JavaScript）は使わず、投稿の文章を静的に表示する */
   .article-body .tweet-card {
-    @apply my-8 max-w-150 rounded-[18px] border border-border bg-bg-card px-5 py-4;
+    @apply relative my-8 max-w-150 rounded-[18px] border border-border bg-bg-card px-5 py-4 transition-shadow duration-300 hover:shadow-xl hover:shadow-black/5;
+  }
+
+  /* 日付のリンク（元の投稿）をカード全体に広げる。投稿の中のリンクは、その上に重ねてクリックできるようにする */
+  .article-body .tweet-card-link::after {
+    @apply absolute inset-0 rounded-[18px];
+    content: '';
+  }
+
+  .article-body .tweet-card blockquote a {
+    @apply relative z-10;
   }
 
   .tweet-card-label {
