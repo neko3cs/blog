@@ -42,7 +42,7 @@
 | SSG | **Analog 2.9（Angular 22）**（採用） | 作者が Angular を好んで書いており、技術者ブログとして「Angular で作ったブログ」であることに意味があるため。Astro と同じ記事ページを試作して比較したうえで決定した（3.1 参照） |
 | ホスティング | **Cloudflare Workers (Static Assets)** | 静的ファイルだけを配信する。無料枠に収まる |
 | 画像 | リポジトリ同梱（`public/images/`）または R2 | 98記事分なら同梱で十分。容量が大きくなったら R2 |
-| ソース管理 | このリポジトリ（`neko3cs/blog`） | GitHub 連携で push 時に自動デプロイ |
+| ソース管理 | このリポジトリ（`neko3cs/blog`） | GitHub Actions で main への push 時に自動デプロイ（#21） |
 
 ### 3.1 SSG の選定（Astro と Analog の比較）
 

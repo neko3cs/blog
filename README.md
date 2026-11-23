@@ -30,6 +30,24 @@ pnpm preview
 
 `http://localhost:8787/entry/how-to-disconnect-sql-server-db-connection` で記事ページを確認できます。
 
+## デプロイ
+
+`main` に push（マージ）すると、GitHub Actions（`.github/workflows/deploy.yml`）がビルドして Cloudflare Workers にデプロイします。Pull request では、ビルドが通ることだけを確かめます。手動で動かすときは、GitHub の Actions 画面から `Deploy` の「Run workflow」を実行します。
+
+デプロイには、リポジトリの Secrets に次の2つが必要です。
+
+| Secret | 内容 |
+| --- | --- |
+| `CLOUDFLARE_API_TOKEN` | Workers の編集権限だけを付けた API トークン（Cloudflare の「API トークン」で、テンプレート「Edit Cloudflare Workers」から作る） |
+| `CLOUDFLARE_ACCOUNT_ID` | Cloudflare のアカウント ID（Workers & Pages の画面の右側に出る） |
+
+```bash
+gh secret set CLOUDFLARE_API_TOKEN
+gh secret set CLOUDFLARE_ACCOUNT_ID
+```
+
+手元から直接デプロイするときは、これまでどおり `pnpm build && pnpm exec wrangler deploy` を実行します。
+
 ## 記事の置き場所
 
 記事は `content/entry/` に、はてなブログの URL パスと同じパスで置きます。
