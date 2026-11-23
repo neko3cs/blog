@@ -17,128 +17,107 @@
   "https://codeer.connpass.com/event/319762/": {
     "title": "Blazor+ローコードで実現する.NET資産のモダナイズ (2024/07/04 13:30〜)",
     "description": "# Blazor+ローコードで実現する.NET資産のモダナイズ ## Blazor Microsoftが推奨する最新技術であるBlazorは、.NET開発者のスキルセットに完全にマッチする最先端のWebテクノロジーです。.NET8でさらなる進化を遂げ今まで以上のユースケースに適応できるようになりました。 ## Codeer.LowCode.Blazor Power Apps や Ki…",
-    "domain": "codeer.connpass.com",
-    "image": "/images/link-cards/116e5f9d2cd2bcc5.png"
+    "domain": "codeer.connpass.com"
   },
   "https://connpass.com/event/122145/": {
     "title": "Visual Studio 2019 Launch Event in Tokyo. (2019/04/21 13:00〜)",
     "description": "Visual Studio 2019のリリースを記念して、Visual Studio 2019の新機能を含めたVisual Studioユーザー向けの勉強会を開催します。 この勉強会は世界各地で行われる「Visual Studio 2019 local launch event」の一つとして開催する予定です。 2019-04-18 追記：実施会場がSeminar Room C+D, Bに変更になりました # ■ Visu…",
-    "domain": "connpass.com",
-    "image": "/images/link-cards/3840a1b122f7e262.png"
+    "domain": "connpass.com"
   },
   "https://connpass.com/event/134377/": {
     "title": ".NET Core 3最新情報セミナー (2019/09/26 13:30〜)",
     "description": "## はじめに いよいよ2019年9月に .NET Core 3 がリリースされます！ .NET Core 3ではWindowsデスクトップ向けアプリケーションを開発できる「Windows Forms」と「WPF」が新たにサポートされます。 これまで .NET Frameworkで開発してきた既存のアプリケーション資産はどうなるのでしょうか？ .NET Coreへと移行するメ…",
-    "domain": "connpass.com",
-    "image": "/images/link-cards/31565dc013a95420.png"
+    "domain": "connpass.com"
   },
   "https://csharp-tokyo.connpass.com/event/142319/": {
     "title": "C#エンジニアのための dockerコンテナ・kubernetesハンズオン (再) (2019/09/10 19:00〜)",
     "description": "# C# Tokyo コミュニティ C# Tokyo コミュニティは C# エンジニアのコミュニティです。C# エンジニア向けのオフラインイベントを主に東京で開催します。詳しくは connpass のグループ詳細を御覧ください。 # イベント概要 このイベントは前回のイベントの同一内容の再演です。dockerコンテナおよびkubernetesを試してみ…",
-    "domain": "csharp-tokyo.connpass.com",
-    "image": "/images/link-cards/b22ec9974fc47139.png"
+    "domain": "csharp-tokyo.connpass.com"
   },
   "https://csugjp.connpass.com/event/122874/": {
     "title": "【Launch 記念】Visual Studio 2019 を試してみる会 (2019/04/10 19:00〜)",
     "description": "# ■ 注意：イベント参加前に Visual Studio 2019 をインストールしておくことを強く推奨します 会場内で Wi-Fi は提供されておりません。 Visual Studio 2019 インストールは事前にすませ、 必要であればテザリングやモバイルルーターをご用意ください。 * https://visualstudio.microsoft.com/ … インストーラの入…",
-    "domain": "csugjp.connpass.com",
-    "image": "/images/link-cards/b0deb2f0527baf1b.png"
+    "domain": "csugjp.connpass.com"
   },
   "https://ddd-community-jp.connpass.com/event/174617/": {
     "title": "テスト駆動開発(TDD)オンライン勉強会 #1 「ライブコーディングで体感するTDD基礎」 (2020/05/04 20:00〜)",
     "description": "## 勉強会概要 DDD オンライン勉強会がこれまで4回好評いただき、 開発する上で欠かすことのできないTDD(テスト駆動開発)についても話すことにしました。 (DDDのイベントではないですが、つながることは多いので派生勉強会としてこのコミュニティのイベントとさせてください) ## 内容 * TDD概要の解説 * ライブ…",
-    "domain": "ddd-community-jp.connpass.com",
-    "image": "/images/link-cards/af6ff2fd2978f572.png"
+    "domain": "ddd-community-jp.connpass.com"
   },
   "https://devblogs.microsoft.com/visualstudio/visual-studio-2019-for-mac-is-now-available/": {
     "title": "Visual Studio 2019 for Mac is now available - Visual Studio Blog",
     "description": "Today, we are excited to announce the general availability of Visual Studio 2019 for Mac – the next major version of our .NET IDE on the Mac. This release is now available as an update in the Stable channel for existing Visual Studio for Mac users, and new users can download and install it today as…",
-    "domain": "devblogs.microsoft.com",
-    "image": "/images/link-cards/015cd4b53e7592ba.png"
+    "domain": "devblogs.microsoft.com"
   },
   "https://docs.microsoft.com/en-us/azure/devops/repos/git/branch-permissions?view=azure-devops#permissions-in-azure-devops-services": {
     "title": "Set Git branch security and permissions - Azure Repos",
     "description": "Set permissions for Git branches in Azure DevOps.",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/dc299d73e8a9c5ed.png"
+    "domain": "docs.microsoft.com"
   },
   "https://docs.microsoft.com/ja-jp/dotnet/core/tools/global-tools?WT.mc_id=DT-MVP-5002209": {
     "title": ".NET ツール - .NET CLI",
     "description": ".NET ツールをインストール、使用、更新、削除する方法。 グローバル ツール、ツール パス ツール、ローカル ツールについて説明します。",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/b7f875f319146e14.png"
+    "domain": "docs.microsoft.com"
   },
   "https://docs.microsoft.com/ja-jp/dotnet/csharp/whats-new/csharp-9#record-types": {
     "title": "C# の歴史",
     "description": "C# 言語が数多くのリリースを経て、どのように変化してきたかを学びましょう。 言語に異なる機能が導入されたタイミングについて説明します。",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/ccc871fcf22f8add.png"
+    "domain": "docs.microsoft.com"
   },
   "https://docs.microsoft.com/ja-jp/dotnet/csharp/whats-new/tutorials/top-level-statements": {
     "title": "最上位レベルのステートメント入門 - C#",
     "description": "このチュートリアルでは、最上位レベルのステートメントを使用して、アイデアを探索しながら概念を試して証明する方法を示します",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/e313c0c3e6cfaac3.png"
+    "domain": "docs.microsoft.com"
   },
   "https://docs.microsoft.com/ja-jp/ef/core/get-started/aspnetcore/existing-db": {
     "title": "RazorASP.NET CoreのEntity Framework Coreを含むページ - チュートリアル 1/8",
     "description": "Entity Framework Core を使用して Razor Pages アプリを作成する方法について説明します",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/91aef43173a52b52.png"
+    "domain": "docs.microsoft.com"
   },
   "https://docs.microsoft.com/ja-jp/ef/core/get-started/aspnetcore/new-db?tabs=visual-studio": {
     "title": "Razor ASP.NET Core での Entity Framework Core を使用した Pages - チュートリアル 1/8",
     "description": "Entity Framework Core を使用して Razor Pages アプリを作成する方法について説明します",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/9ce111dd830d996e.png"
+    "domain": "docs.microsoft.com"
   },
   "https://docs.microsoft.com/ja-jp/ef/core/miscellaneous/cli/dotnet": {
     "title": "EF Core ツールのリファレンス (.NET CLI) - EF Core",
     "description": "Entity Framework Core .NET CLI ツールのリファレンス ガイド",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/bd0a4507734964a5.png"
+    "domain": "docs.microsoft.com"
   },
   "https://docs.microsoft.com/ja-jp/visualstudio/releasenotes/vs2019-mac-relnotes#rtw": {
     "title": "Visual Studio 2019 for Mac v8.10 - Release Notes",
     "description": "Get information on the latest release features, bug fixes, and support for Visual Studio 2019 v8.10 for Mac. Download today.",
-    "domain": "docs.microsoft.com",
-    "image": "/images/link-cards/3c3cb57aead30aa0.png"
+    "domain": "docs.microsoft.com"
   },
   "https://forms.gle/4QjMzeApRkzQWkDa7": {
     "title": "在宅勤務、どうですか？",
     "description": "",
-    "domain": "forms.gle",
-    "image": "/images/link-cards/c931d6b85fcd5489.png"
+    "domain": "forms.gle"
   },
   "https://gist.github.com/neko3cs/41ffe86c0e93ab6bc61e7dac42c51cf4": {
     "title": "IsNotStatement.cs",
     "description": "GitHub Gist: instantly share code, notes, and snippets.",
-    "domain": "gist.github.com",
-    "image": "/images/link-cards/b717bd6775f9cd69.png"
+    "domain": "gist.github.com"
   },
   "https://github.blog/2022-04-12-git-security-vulnerability-announced/": {
     "title": "Git security vulnerability announced",
     "description": "Upgrade your local installation of Git, especially if you are using Git for Windows, or you use Git on a multi-user machine.",
-    "domain": "github.blog",
-    "image": "/images/link-cards/4f295d2b32fdbb35.png"
+    "domain": "github.blog"
   },
   "https://github.com/": {
     "title": "GitHub · Change is constant. GitHub keeps you ahead. · GitHub",
     "description": "Join the world's most widely adopted, AI-powered developer platform where millions of developers, businesses, and the largest open source community build software that advances humanity.",
-    "domain": "github.com",
-    "image": "/images/link-cards/09a8b930c8b79e7c.jpg"
+    "domain": "github.com"
   },
   "https://github.com/dezz/ULE4JIS/blob/master/publish/Ule4Jis.exe": {
     "title": "ULE4JIS/publish/Ule4Jis.exe at master · dezz/ULE4JIS",
     "description": "Contribute to dezz/ULE4JIS development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/0cbaa2e610b767af.png"
+    "domain": "github.com"
   },
   "https://github.com/dezz/ULE4JIS/tree/master/publish": {
     "title": "ULE4JIS/publish at master · dezz/ULE4JIS",
     "description": "Contribute to dezz/ULE4JIS development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/23394fc4e1434032.png"
+    "domain": "github.com"
   },
   "https://github.com/dotnet/runtime/issues/45382": {
     "title": "Support Single File Diagnostics · Issue #45382 · dotnet/runtime",
@@ -148,20 +127,17 @@
   "https://github.com/gerardog/gsudo": {
     "title": "GitHub - gerardog/gsudo: Sudo for Windows",
     "description": "Sudo for Windows. Contribute to gerardog/gsudo development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/ae97297dafbdadaf.png"
+    "domain": "github.com"
   },
   "https://github.com/gerardog/gsudo#usage": {
     "title": "GitHub - gerardog/gsudo: Sudo for Windows",
     "description": "Sudo for Windows. Contribute to gerardog/gsudo development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/326bc0b6d4415415.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs": {
     "title": "neko3cs - Overview",
     "description": "Web Developer, Software Engineer for Enterprise. neko3cs has 45 repositories available. Follow their code on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/e917046c8e2c0a0f.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs/15Puzzle": {
     "title": "GitHub - neko3cs/15Puzzle",
@@ -171,8 +147,7 @@
   "https://github.com/neko3cs/cryptstr": {
     "title": "GitHub - neko3cs/cryptstr: (En|De)crypting string tool.",
     "description": "(En|De)crypting string tool. Contribute to neko3cs/cryptstr development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/475129f3f5bc5686.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs/dn-zip": {
     "title": "GitHub - neko3cs/dnzip: Zip tool made with dotnet.",
@@ -187,8 +162,7 @@
   "https://github.com/neko3cs/dotfiles": {
     "title": "GitHub - neko3cs/.dotfiles: dotfiles managing repository.",
     "description": "dotfiles managing repository. Contribute to neko3cs/.dotfiles development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/ee0aadec6b17d37e.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs/express-web-api-template": {
     "title": "GitHub - neko3cs/express-web-api-template: Template of express web api",
@@ -198,8 +172,7 @@
   "https://github.com/neko3cs/ManHoursManager": {
     "title": "GitHub - neko3cs/ManHoursManager: React+Tauriで作った工数管理アプリです。",
     "description": "React+Tauriで作った工数管理アプリです。. Contribute to neko3cs/ManHoursManager development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/3e4bbfa6f8ab1c27.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs/neko3cs-lab/tree/main/deploy-virtual-machine-to-azure": {
     "title": "neko3cs-lab/deploy-virtual-machine-to-azure at main · neko3cs/neko3cs-lab",
@@ -214,20 +187,17 @@
   "https://github.com/neko3cs/neko3cs-lab/tree/main/entity-framework-core-for-blog": {
     "title": "neko3cs-lab/entity-framework-core-for-blog at main · neko3cs/neko3cs-lab",
     "description": "技術調査などのソースコードをまとめたリポジトリ. Contribute to neko3cs/neko3cs-lab development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/d7f83773a5a102e9.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs/neko3cs-lab/tree/main/mssql-database/adventure-works-lt2022": {
     "title": "neko3cs-lab/mssql-database/adventure-works-lt2022 at main · neko3cs/neko3cs-lab",
     "description": "技術調査などのソースコードをまとめたリポジトリ. Contribute to neko3cs/neko3cs-lab development by creating an account on GitHub.",
-    "domain": "github.com",
-    "image": "/images/link-cards/0f8f960c7c4b4241.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs/PSSQLBulkCopy": {
     "title": "GitHub - neko3cs/PSSQLBulkCopy: This is a SQLBulkCopy Wrapper for using PowerShell.",
     "description": "This is a SQLBulkCopy Wrapper for using PowerShell. - neko3cs/PSSQLBulkCopy",
-    "domain": "github.com",
-    "image": "/images/link-cards/cd2520b2aa2b4940.png"
+    "domain": "github.com"
   },
   "https://github.com/neko3cs/pwsh-tools/blob/master/Out-TestDataSqlFromExcel.ps1": {
     "title": "pwsh-tools/Out-TestDataSqlFromExcel.ps1 at main · neko3cs/pwsh-tools",
@@ -242,8 +212,7 @@
   "https://github.com/PowerShell/PowerShellGetv2/issues/606": {
     "title": "Failed to generate the compressed file for module 'Cannot index into a null array'. · Issue #606 · PowerShell/PowerShellGetv2",
     "description": "I am trying to publish a module from a MacOS. Sydney Smith (@SydneyhSmith) tagging you hopping you can help resolve this one quickly. Steps to reproduce Publish-Module -Name FakeFile -NuGetApiKey $...",
-    "domain": "github.com",
-    "image": "/images/link-cards/c8d8853ccadd3fbe.png"
+    "domain": "github.com"
   },
   "https://github.com/xunit/xunit/issues/1102": {
     "title": "xUnit 2.2.0-rc1-build3507 package not working in .NET 4.5.1 test runs · Issue #1102 · xunit/xunit",
@@ -253,38 +222,32 @@
   "https://learn.microsoft.com/ja-jp/dotnet/csharp/language-reference/operators/is": {
     "title": "'is' 演算子 - 式を型または定数パターンと照合します - C# reference",
     "description": "パターンに対して式に一致する C# 'is' 演算子について説明します。 式がパターンと一致すると、'is' 演算子は true を返します。",
-    "domain": "learn.microsoft.com",
-    "image": "/images/link-cards/41fba580becdcde8.png"
+    "domain": "learn.microsoft.com"
   },
   "https://learn.microsoft.com/ja-jp/sql/samples/adventureworks-install-configure?view=sql-server-ver16&tabs=ssms": {
     "title": "AdventureWorks サンプル データベース - SQL Server",
     "description": "次の手順に従って、AdventureWorks サンプル データベースをダウンロードして SQL Server にインストールします。",
-    "domain": "learn.microsoft.com",
-    "image": "/images/link-cards/838c39d8098b01be.png"
+    "domain": "learn.microsoft.com"
   },
   "https://marketplace.visualstudio.com/items?itemName=ms-mssql.mssql": {
     "title": "SQL Server (mssql) - Visual Studio Marketplace",
     "description": "Extension for Visual Studio Code - Design and optimize schemas for SQL Server, Azure SQL, and SQL Database in Fabric using a modern, lightweight extension built for developers",
-    "domain": "marketplace.visualstudio.com",
-    "image": "/images/link-cards/9e77f5bd6427d5f8.png"
+    "domain": "marketplace.visualstudio.com"
   },
   "https://martinfowler.com/articles/micro-frontends.html": {
     "title": "Micro Frontends",
     "description": "How to split up your large, complex, frontend codebases into simple, composable, independently deliverable apps.",
-    "domain": "martinfowler.com",
-    "image": "/images/link-cards/0ec749cd01b84e03.png"
+    "domain": "martinfowler.com"
   },
   "https://mercari.connpass.com/event/196150/": {
     "title": "merpay Tech Talk ~ 伝わる技術文書の書き方 ~ (2020/12/01 16:30〜)",
     "description": "# 概要 merpay Tech Talk は、毎回各テーマに興味のあるエンジニアたちが集まり、技術的な知見を共有しあうことを目的とした勉強会です。 今回のテーマは 『伝わる技術文書を書く』 についてです。 エンジニアは技術発信や設計書など、文書を書く機会がとても多いですよね。 このコロナ禍で文書を書く力はより一層重…",
-    "domain": "mercari.connpass.com",
-    "image": "/images/link-cards/54caee851e34371a.png"
+    "domain": "mercari.connpass.com"
   },
   "https://qiita.com/mzntaka0/items/f25707e4d837bd081db5": {
     "title": "ubuntu16.04 LTS用のLive USBをmacで作成する - Qiita",
     "description": "この記事でやること Ubuntu16.04 LTS用のLive USBを作成(on macOS) ※本記事に記載された事項に関して一切の責任を負いません。 くれぐれも気をつけて実行してください。 ステップ USBメモリ(16GB以上推奨)を用意 ubuntu16.04...",
-    "domain": "qiita.com",
-    "image": "/images/link-cards/4130e3f12bdbf2b1.jpg"
+    "domain": "qiita.com"
   },
   "https://soracom.jp/products/gadgets/": {
     "title": "https://soracom.jp/products/gadgets/",
@@ -294,56 +257,47 @@
   "https://stackoverflow.com/questions/1679986/zip-file-created-with-sharpziplib-cannot-be-opened-on-mac-os-x": {
     "title": "ZIP file created with SharpZipLib cannot be opened on Mac OS X",
     "description": "Argh, today is the day of stupid problems and me being an idiot. I have an application which creates a zip file containing some JPEGs from a certain directory. I use this code in order to: read ...",
-    "domain": "stackoverflow.com",
-    "image": "/images/link-cards/8c1c283b6e36bafe.png"
+    "domain": "stackoverflow.com"
   },
   "https://stackoverflow.com/questions/55235825/error-failed-to-build-ios-project-we-ran-xcodebuild-command-but-it-exited-wit": {
     "title": "error Failed to build iOS project. We ran \"xcodebuild\" command but it exited with error code 65",
     "description": "I've build a react-native application and suddenly I get this error message on my terminal during run of the command react-native run-ios. The same code work fine 10 minutes ago and suddenly I get ...",
-    "domain": "stackoverflow.com",
-    "image": "/images/link-cards/f8078f754bf297aa.png"
+    "domain": "stackoverflow.com"
   },
   "https://techbookfest.org/event/tbf06": {
     "title": "技術書典6",
     "description": "技術書の祭典が2019年04月14日（日）＠池袋サンシャインシティ2F 展示ホールD（文化会館ビル2F）で開催決定！",
-    "domain": "techbookfest.org",
-    "image": "/images/link-cards/5ff2c41e9ec9e4af.jpg"
+    "domain": "techbookfest.org"
   },
   "https://www.katacoda.com": {
     "title": "Katacoda - Interactive Learning Platform for Software Engineers",
     "description": "Learn the latest technologies with our hands-on labs",
-    "domain": "www.katacoda.com",
-    "image": "/images/link-cards/f0ed5f2337dd9006.png"
+    "domain": "www.katacoda.com"
   },
   "https://www.nuget.org/packages/CryptStr/": {
     "title": "CryptStr 2.2.1",
     "description": "Package Description",
-    "domain": "www.nuget.org",
-    "image": "/images/link-cards/40861c613c26b40d.png"
+    "domain": "www.nuget.org"
   },
   "https://www.nuget.org/packages/DnZip": {
     "title": "DnZip 3.0.0",
     "description": "Package Description",
-    "domain": "www.nuget.org",
-    "image": "/images/link-cards/83b668ec19f2b903.png"
+    "domain": "www.nuget.org"
   },
   "https://www.nuget.org/packages/System.Windows.Interactivity.WPF/": {
     "title": "System.Windows.Interactivity.WPF 2.0.20525",
     "description": "Microsoft Expression Blend 4 SDK includes new built-in behaviors, which are reusable pieces of packaged code that can be attached to any DependencyObject, and then fine-tuned by changing their properties. Behaviors allow you to add interactivity to your applications without having to write…",
-    "domain": "www.nuget.org",
-    "image": "/images/link-cards/1cc9a2ece20c80f7.png"
+    "domain": "www.nuget.org"
   },
   "https://www.powershellgallery.com/packages/ImportExcel/7.1.1": {
     "title": "ImportExcel 7.1.1",
     "description": "PowerShell module to import/export Excel spreadsheets, without Excel. Check out the How To Videos https://www.youtube.com/watch?v=U3Ne_yX4tYo&list=PL5uoqS92stXioZw-u-ze_NtvSo0k0K0kq",
-    "domain": "www.powershellgallery.com",
-    "image": "/images/link-cards/a0c384afab14eb92.png"
+    "domain": "www.powershellgallery.com"
   },
   "https://www.powershellgallery.com/packages/PSSQLBulkCopy/1.0.0": {
     "title": "PSSQLBulkCopy 1.0.0",
     "description": ".NETのSQLBulkCopyを実行します。テーブル名とCSVファイルパスを指定することで任意のテーブルにCSVの値を登録することが出来ます。",
-    "domain": "www.powershellgallery.com",
-    "image": "/images/link-cards/92b8f08f79fe34bc.png"
+    "domain": "www.powershellgallery.com"
   },
   "https://www.slideshare.net/slideshow/2024-07-04-blazor-net/270071419": {
     "title": "Client Challenge",
@@ -353,13 +307,11 @@
   "https://zenn.dev/neko3cs/articles/cancel-transaction-in-ssms-memo": {
     "title": "本番環境のSSMSでトランザクションキャンセルした際にやらかした話",
     "description": "",
-    "domain": "zenn.dev",
-    "image": "/images/link-cards/2e5fc46ab5281d9c.png"
+    "domain": "zenn.dev"
   },
   "https://zenn.dev/neko3cs/articles/emend-git-commit-with-rebase": {
     "title": "git rebaseを使って過去のコミットを修正する",
     "description": "",
-    "domain": "zenn.dev",
-    "image": "/images/link-cards/7a36d610a77cce01.png"
+    "domain": "zenn.dev"
   }
 }

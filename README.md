@@ -49,13 +49,13 @@ YouTube・SlideShare・Speaker Deck は、各サービスの「埋め込む」�
 
 ### リンクカード
 
-段落にリンクを1つだけ置くと、リンク先のタイトル・説明・画像入りのカードで表示されます。カードのタイトルには、リンクの文字が使われます。
+段落にリンクを1つだけ置くと、リンク先のタイトル・説明・ドメインを並べたカードで表示されます。カードのタイトルには、リンクの文字が使われます。
 
 ```markdown
 [GitHub - neko3cs/PSSQLBulkCopy](https://github.com/neko3cs/PSSQLBulkCopy)
 ```
 
-リンク先の情報は `content/link-cards.json` に、サムネイルは `public/images/link-cards/` に保存してあり、ビルドではリンク先にアクセスしません。新しいリンクを書いたら、次のコマンドで情報を取得します（情報は、はてなブログのリンクカードと同じ hatenablog-parts.com から取ります）。
+リンク先の情報は `content/link-cards.json` に保存してあり、ビルドではリンク先にアクセスしません。他のサイトの画像を管理しないよう、サムネイルは出しません。新しいリンクを書いたら、次のコマンドで情報を取得します（情報は、はてなブログのリンクカードと同じ hatenablog-parts.com から取ります）。
 
 ```bash
 pnpm fetch:link-cards

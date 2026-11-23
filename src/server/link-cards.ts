@@ -19,8 +19,6 @@ import { readEntries } from './entries.ts';
 export interface LinkCard {
   title: string;
   description: string;
-  /** サイト内に保存したサムネイル（/images/link-cards/….jpg） */
-  image?: string;
   /** github.com など、カードの下に出すサイトのドメイン */
   domain: string;
 }
@@ -54,9 +52,6 @@ function plainText(tokens: Token[]): string {
 }
 
 function cardHtml(href: string, title: string, card: Omit<LinkCard, 'title'>): string {
-  const image = card.image
-    ? `<img class="link-card-image" src="${escapeHtml(card.image)}" alt="" width="200" height="200" loading="lazy">`
-    : '';
   // はてなのリンクカードと同じく、外部のサイトは新しいタブで開く（サイト内の記事は同じタブで開く）
   const target = href.startsWith('/') ? '' : ' target="_blank" rel="noopener"';
   return (
@@ -67,7 +62,6 @@ function cardHtml(href: string, title: string, card: Omit<LinkCard, 'title'>): s
     (card.description && card.description !== title ? `<span class="link-card-description">${escapeHtml(card.description)}</span>` : '') +
     `<span class="link-card-domain">${escapeHtml(card.domain)}</span>` +
     '</span>' +
-    image +
     '</a>\n'
   );
 }

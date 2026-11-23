@@ -1,4 +1,4 @@
-// リンクカードに出すリンク先の情報（タイトル・説明・サムネイル・ドメイン）を取得し、content/link-cards.json に保存する（Issue #6）。
+// リンクカードに出すリンク先の情報（タイトル・説明・ドメイン）を取得し、content/link-cards.json に保存する（Issue #6）。
 // ビルドはこのファイルを読むだけで、リンク先にはアクセスしない。リンク先のページが消えてもカードを表示できる。
 //
 // 使い方:
@@ -7,11 +7,10 @@
 //
 // 情報は、はてなブログのリンクカード（hatenablog-parts.com）から取る。
 // はてなのころと同じ内容で表示でき、はてなが保存した内容を返すため、消えたページの情報も取れる。
-// サムネイルは public/images/link-cards/ にダウンロードし、閲覧時に外部のサイトへアクセスしないようにする。
+// サムネイルは使わない。他のサイトの画像をリポジトリで管理せず、閲覧時に外部のサイトへアクセスもしないため。
 
-import { createHash } from 'node:crypto';
 import { readdirSync, readFileSync } from 'node:fs';
-import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
@@ -24,7 +23,6 @@ import { decodeEntities } from './lib/html.mjs';
 import { mapWithLimit } from './lib/page-info.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const IMAGE_DIR = join(ROOT, 'public/images/link-cards');
 
 const { values } = parseArgs({ options: { refresh: { type: 'boolean', default: false } } });
 
@@ -60,32 +58,11 @@ async function fetchCard(url) {
   if (!title) {
     throw new Error('リンク先のタイトルがありません');
   }
-  const card = {
+  return {
     title,
     description: textOf(html.match(/<div class="entry-content">([\s\S]*?)<\/div>/)?.[1] ?? ''),
     domain: new URL(url).host,
   };
-  const thumbnail = html.match(/<img src="([^"]+)" class="thumb">/)?.[1];
-  if (thumbnail) {
-    card.image = await downloadThumbnail(url, decodeEntities(thumbnail));
-  }
-  return card;
-}
-
-const EXTENSIONS = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/gif': 'gif', 'image/webp': 'webp' };
-
-/** サムネイルを保存し、サイト内のパスを返す。ファイル名はリンク先の URL から決める */
-async function downloadThumbnail(url, src) {
-  const res = await fetch(src);
-  const extension = EXTENSIONS[res.headers.get('content-type')?.split(';')[0] ?? ''];
-  if (!res.ok || !extension) {
-    await res.body?.cancel();
-    return undefined;
-  }
-  const name = `${createHash('sha256').update(url).digest('hex').slice(0, 16)}.${extension}`;
-  await mkdir(IMAGE_DIR, { recursive: true });
-  await writeFile(join(IMAGE_DIR, name), Buffer.from(await res.arrayBuffer()));
-  return `/images/link-cards/${name}`;
 }
 
 let cards = {};

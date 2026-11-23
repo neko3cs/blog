@@ -160,10 +160,6 @@
     @apply mt-auto truncate pt-1 text-xs text-text-sub;
   }
 
-  .article-body .link-card-image {
-    @apply m-0 w-20 shrink-0 self-stretch object-cover sm:w-28;
-  }
-
   /* X の投稿。公式の埋め込み（JavaScript）は使わず、投稿の文章を静的に表示する */
   .article-body .tweet-card {
     @apply relative my-8 max-w-150 rounded-[18px] border border-border bg-bg-card px-5 py-4 transition-shadow duration-300 hover:shadow-xl hover:shadow-black/5;
