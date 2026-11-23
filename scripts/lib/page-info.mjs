@@ -9,8 +9,9 @@ function decodeEntities(text) {
 }
 
 /**
- * URL を取得し、ステータス・リダイレクト先・title・canonical を返す。
+ * URL を取得し、ステータス・リダイレクト先・title・canonical・noindex の有無を返す。
  * リダイレクトは追わない（URL が変わっていないかを確かめるため）。
+ * noindex は X-Robots-Tag ヘッダーと robots の meta タグの両方を見る。
  */
 export async function fetchPageInfo(url) {
   const res = await fetch(url, { redirect: 'manual' });
@@ -20,11 +21,13 @@ export async function fetchPageInfo(url) {
     contentType: res.headers.get('content-type') ?? '',
     title: '',
     canonical: '',
+    noindex: /noindex/i.test(res.headers.get('x-robots-tag') ?? ''),
   };
   if (res.status === 200 && info.contentType.includes('text/html')) {
     const html = await res.text();
     info.title = decodeEntities(html.match(/<title>([^<]*)<\/title>/)?.[1]?.trim() ?? '');
     info.canonical = html.match(/<link rel="canonical" href="([^"]*)"/)?.[1] ?? '';
+    info.noindex ||= /<meta name="robots" content="[^"]*noindex/i.test(html);
   } else {
     await res.body?.cancel();
   }
