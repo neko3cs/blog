@@ -190,25 +190,30 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 - [x] `/feed`（Atom）と `/rss`（RSS 2.0）を Nitro のサーバールートで実装し、プリレンダーで静的ファイルにする
 - [x] sitemap を Nitro のサーバールートで生成する（載せるページを選び、記事に更新日時を付けるため、Analog の `prerender.sitemap` は使わない）
 - [x] デザイン（ポートフォリオとトーンを揃える）
-- [ ] Cloudflare Workers に `*.workers.dev` でデプロイする（この時点では本番ドメインに触れない）
+- [x] Cloudflare Workers に `*.workers.dev` でデプロイする（この時点では本番ドメインに触れない）。2026-11-23 に `pnpm build && pnpm exec wrangler deploy` で `https://neko3cs-blog.neko3cs.workers.dev` にデプロイした
 
 ### Phase 3: 検証（切り替え前）
 
-- [ ] **URL 検証スクリプト**（`pnpm check:urls <URL>`、作成済み）: `migration/baseline.csv` の全パスを `*.workers.dev` に投げて、次の4点を確認する
+- [x] **URL 検証スクリプト**（`pnpm check:urls <URL>`）: `migration/baseline.csv` の全パスを `*.workers.dev` に投げて、次の5点を確認する（2026-11-23、103件すべて一致）
   - ステータスが 200 であること（301/308/404 は不合格）
   - 最終URLのパスが元と完全に一致すること
   - `canonical` が `https://blog.neko3cs.net/<同じパス>` であること
   - `title` が Phase 0 の記録と一致すること
-- [ ] `.` を含む slug、日本語カテゴリ、`/feed`、`/rss` の Content-Type を個別に確認する
+  - `noindex` が、`*.workers.dev` では付いていて、それ以外（本番・ローカル）では付いていないこと
+- [x] `.` を含む slug、日本語カテゴリ、`/feed`、`/rss` の Content-Type を個別に確認する（`.` を含む2記事、`シェル`・`SQL Server`・`.NET`・`C#`・`ローコード/ノーコード`、日別アーカイブが 200。フィードは `application/atom+xml`・`application/rss+xml`）
 - [ ] 重点確認リストの記事を目視で確認する（コードブロック、画像、埋め込み）
-- [ ] プレビュー環境は `noindex` にして、重複コンテンツとしてクロールされないようにする
+- [x] プレビュー環境は `noindex` にして、重複コンテンツとしてクロールされないようにする（`public/_headers` で `*.workers.dev` のホストにだけ `X-Robots-Tag: noindex` を付ける。本番のホストには付かないので、切り替え時に外す作業はない）
+- [ ] Google のリッチリザルトテストで、記事ページの構造化データを確認する
+
+> Node の `fetch` はプロキシの環境変数を見ないため、プロキシ越しに検証するときは `NODE_USE_ENV_PROXY=1 pnpm check:urls <URL>` とする。
 
 ### Phase 4: 切り替え（DNS スイッチ）
 
 1. DNS の TTL がすでに 300 秒であることを確認する（現状 300 のため変更不要）
 2. Cloudflare ダッシュボードで、既存の `blog` CNAME（→ `hatenablog.com`）を削除し、すぐに Worker のカスタムドメインに `blog.neko3cs.net` を追加する
 3. 本番ドメインに対して Phase 3 の検証スクリプトを再実行する
-4. プレビュー用の `noindex` が本番に残っていないことを確認する
+4. プレビュー用の `noindex` が本番に残っていないことを確認する（3. の検証スクリプトで確認できる）
+5. はてなの独自ドメインの設定は**外さない**。設定があるあいだ、はてなのサブドメイン（`neko3cs.hatenablog.com`）は `blog.neko3cs.net` へ 301 でリダイレクトする（2026-11-23 に確認）。DNS が新サイトを向けば、はてなには `blog.neko3cs.net` へのリクエストが届かないので、URL は衝突しない。外すとサブドメインで記事が公開され、重複コンテンツになる
 
 切り替え中は、旧サイトも新サイトも同じURLで同じ内容を返します。**ダウンタイムも 404 も発生しません。**
 
@@ -216,6 +221,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 - [ ] 新サイトが1〜2週間安定してから、はてなブログを**「非公開」**にする
   - 独自ドメインの設定を外すだけだと、はてなのサブドメイン（`*.hatenablog.com` など）で同じ記事が公開されてしまい、**重複コンテンツになる**。必ず非公開にする
+  - Pro の期限が切れると独自ドメインの機能も止まり、サブドメインで記事が公開される恐れがある（未確認）。**Pro の期限より前に**非公開にする
 - [ ] はてなブログProの**自動更新を停止**する（解約は契約期間の満了時に効く。切り替えとPro期限が重ならないよう、余裕をもって進める）
 - [ ] はてなのアカウント自体はしばらく削除せず、保険として残す
 

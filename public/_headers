@@ -6,3 +6,8 @@
 
 /rss
   Content-Type: application/rss+xml; charset=utf-8
+
+# プレビュー（*.workers.dev）は本番と同じ内容の重複になるため、検索エンジンに載せない
+# ホスト名で絞っているので、本番（blog.neko3cs.net）には付かない
+https://:worker.:subdomain.workers.dev/*
+  X-Robots-Tag: noindex

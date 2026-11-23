@@ -3,6 +3,7 @@
 //   - リダイレクトされずに 200 を返すこと
 //   - HTML なら title がはてなと一致し、canonical が https://blog.neko3cs.net/<同じパス> であること
 //   - フィードなら XML として返ること
+//   - プレビュー（*.workers.dev）なら noindex が付き、それ以外（本番・ローカル）なら付いていないこと
 //
 // 使い方:
 //   pnpm check:urls http://localhost:8787
@@ -27,9 +28,15 @@ const baseline = parseCsv(await readFile(new URL('../migration/baseline.csv', im
 const filter = values.filter ? new RegExp(values.filter) : undefined;
 const targets = baseline.filter((row) => row.status === '200' && (!filter || filter.test(row.path)));
 
+// public/_headers で workers.dev のホストにだけ X-Robots-Tag: noindex を付けている
+const expectNoindex = new URL(base).hostname.endsWith('.workers.dev');
+
 const results = await mapWithLimit(targets, 4, async (expected) => {
   const actual = await fetchPageInfo(`${base}${expected.path}`);
   const problems = [];
+  if (actual.noindex !== expectNoindex) {
+    problems.push(expectNoindex ? 'noindex が付いていない（プレビューが検索に載る）' : 'noindex が付いている');
+  }
   if (actual.status !== 200) {
     problems.push(`ステータスが ${actual.status}${actual.location ? `（→ ${actual.location}）` : ''}`);
   } else if (expected.contentType.includes('text/html')) {
