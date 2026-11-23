@@ -29,19 +29,18 @@ const { values } = parseArgs({ options: { refresh: { type: 'boolean', default: f
 /** 記事（下書きも含む）で、段落にリンクを1つだけ置いたリンク先 */
 function collectUrls() {
   const urls = new Set();
-  for (const dir of ['content/entry', 'content/drafts']) {
-    for (const file of readdirSync(join(ROOT, dir), { recursive: true, encoding: 'utf8' })) {
-      if (!file.endsWith('.md')) {
-        continue;
-      }
-      const { body } = fm(readFileSync(join(ROOT, dir, file), 'utf8'));
-      marked.walkTokens(marked.lexer(body), (token) => {
-        const link = token.type === 'paragraph' ? standaloneLink(token) : undefined;
-        if (link && /^https?:\/\//.test(link.href) && !internalPath(link.href)) {
-          urls.add(link.href);
-        }
-      });
+  const dir = 'content/entry';
+  for (const file of readdirSync(join(ROOT, dir), { recursive: true, encoding: 'utf8' })) {
+    if (!file.endsWith('.md')) {
+      continue;
     }
+    const { body } = fm(readFileSync(join(ROOT, dir, file), 'utf8'));
+    marked.walkTokens(marked.lexer(body), (token) => {
+      const link = token.type === 'paragraph' ? standaloneLink(token) : undefined;
+      if (link && /^https?:\/\//.test(link.href) && !internalPath(link.href)) {
+        urls.add(link.href);
+      }
+    });
   }
   return [...urls];
 }
