@@ -10,7 +10,8 @@
     "baseline": "node scripts/record-baseline.mjs",
     "check:urls": "node scripts/check-urls.mjs",
     "import:hatena": "node scripts/import-hatena.mjs",
-    "check:content": "node scripts/check-content.mjs"
+    "check:content": "node scripts/check-content.mjs",
+    "fetch:link-cards": "node scripts/fetch-link-cards.mjs"
   },
   "dependencies": {
     "@analogjs/content": "2.9.7",

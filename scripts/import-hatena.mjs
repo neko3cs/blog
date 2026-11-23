@@ -18,6 +18,7 @@ import TurndownService from 'turndown';
 import { gfm } from 'turndown-plugin-gfm';
 
 import { SITE_URL } from '../src/lib/site.ts';
+import { decodeEntities } from './lib/html.mjs';
 import { mapWithLimit, parseCsv } from './lib/page-info.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
@@ -37,16 +38,6 @@ const LANGUAGES = {
   vimrc: 'viml', latex: 'latex', html: 'html', csv: 'csv', yaml: 'yaml',
   txt: 'text', '': 'text',
 };
-
-const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ' };
-function decodeEntities(text) {
-  return text.replace(/&(#x[0-9a-f]+|#\d+|\w+);/gi, (match, code) => {
-    if (code[0] === '#') {
-      return String.fromCodePoint(code[1] === 'x' ? parseInt(code.slice(2), 16) : parseInt(code.slice(1), 10));
-    }
-    return ENTITIES[code] ?? match;
-  });
-}
 
 /** 日本時間の ISO 8601 文字列（2023-01-19T19:46:26+09:00） */
 function toJstIso(date) {

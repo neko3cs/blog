@@ -139,6 +139,57 @@
     aspect-ratio: 16 / 9;
   }
 
+  /* リンクカード（段落にリンクを1つだけ置いたもの）。src/server/link-cards.ts で HTML にしている */
+  .article-body a.link-card {
+    @apply my-8 flex max-w-150 overflow-hidden rounded-[18px] border border-border bg-bg-card text-text-main no-underline transition-shadow duration-300 hover:shadow-xl hover:shadow-black/5;
+  }
+
+  .link-card-body {
+    @apply flex min-w-0 flex-1 flex-col gap-1 px-5 py-4;
+  }
+
+  .link-card-title {
+    @apply line-clamp-2 text-[15px] leading-snug font-bold;
+  }
+
+  .link-card-description {
+    @apply line-clamp-2 text-[13px] leading-normal text-text-sub;
+  }
+
+  .link-card-domain {
+    @apply mt-auto truncate pt-1 text-xs text-text-sub;
+  }
+
+  .article-body .link-card-image {
+    @apply m-0 w-20 shrink-0 self-stretch object-cover sm:w-28;
+  }
+
+  /* X の投稿。公式の埋め込み（JavaScript）は使わず、投稿の文章を静的に表示する */
+  .article-body .tweet-card {
+    @apply my-8 max-w-150 rounded-[18px] border border-border bg-bg-card px-5 py-4;
+  }
+
+  .tweet-card-label {
+    @apply m-0 text-xs font-bold text-text-sub;
+  }
+
+  .article-body .tweet-card blockquote {
+    @apply my-2 border-0 p-0 font-normal not-italic text-text-main;
+  }
+
+  .article-body .tweet-card blockquote p {
+    @apply my-2;
+  }
+
+  .article-body .tweet-card blockquote p::before,
+  .article-body .tweet-card blockquote p::after {
+    content: none;
+  }
+
+  .article-body .tweet-card figcaption {
+    @apply mt-0 text-left text-sm text-text-sub;
+  }
+
   /* Shiki はインラインで背景色を指定するため、カード色に合わせて上書きする */
   .article-body pre.shiki {
     @apply my-8 rounded-[15px] px-5 py-4 font-mono text-[15px] leading-[1.67];
