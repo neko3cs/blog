@@ -11,6 +11,8 @@
     "check:urls": "node scripts/check-urls.mjs",
     "import:hatena": "node scripts/import-hatena.mjs",
     "check:content": "node scripts/check-content.mjs",
+    "check:frontmatter": "node scripts/check-frontmatter.mjs",
+    "test:cms-auth": "node --test workers/cms-auth/test/",
     "fetch:link-cards": "node scripts/fetch-link-cards.mjs"
   },
   "dependencies": {

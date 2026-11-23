@@ -1,0 +1,124 @@
+# Sveltia CMS の設定（Issue #20）。記事の frontmatter は src/app/entry-attributes.ts と揃える。
+backend:
+  name: github
+  repo: neko3cs/blog
+  branch: main
+  # OAuth の受け口（workers/cms-auth）。neko3cs 以外にはトークンを渡さない
+  base_url: https://neko3cs-blog-cms-auth.neko3cs.workers.dev
+  auth_endpoint: auth
+  # 公開リポジトリだけに書き込める権限に絞る
+  auth_scope: public_repo
+  commit_messages:
+    create: 'cms: 記事を追加する（{{slug}}）'
+    update: 'cms: 記事を更新する（{{slug}}）'
+    delete: 'cms: 記事を削除する（{{slug}}）'
+    uploadMedia: 'cms: 画像を追加する（{{path}}）'
+    deleteMedia: 'cms: 画像を削除する（{{path}}）'
+
+site_url: https://blog.neko3cs.net
+app_title: 記事の管理
+
+# 空の任意の項目（カテゴリのない記事の Category など）を、保存するときに書き出さない
+output:
+  omit_empty_optional_fields: true
+
+# 本文から参照するときは /images/uploads/<ファイル名>
+media_folder: public/images/uploads
+public_folder: /images/uploads
+
+# 記事のファイルのパスが、記事の URL のパスになる（content/entry/foo.md → /entry/foo）。
+# URL が /entry/<スラッグ> の記事と、はてなブログ時代の /entry/2020/03/30/002449 形式の記事で、コレクションを分ける。
+# 後者は URL を自動で作り直すと壊れるため、新規作成を止め、URL を変えられないようにしている。
+collections:
+  - name: entry
+    label: 記事
+    label_singular: 記事
+    folder: content/entry
+    extension: md
+    format: yaml-frontmatter
+    # ファイル名は、URL の最後の部分（スラッグ）にする（admin/transforms.js の entry_slug）。
+    # 新しい記事は、URL を入力するだけで、ファイル名も決まる
+    path: '{{slug}}'
+    slug:
+      template: '{{fields.URL | entry_slug}}'
+      editable: false
+    identifier_field: Title
+    summary: '{{Title}}'
+    filter:
+      field: URL
+      pattern: '^https://blog\.neko3cs\.net/entry/[^/]+$'
+    create: true
+    delete: true
+    sortable_fields:
+      fields: [Date, Title]
+      default:
+        field: Date
+        direction: descending
+    view_filters:
+      filters:
+        - { name: draft, label: 下書き, field: Draft, pattern: true }
+        - { name: published, label: 公開済み, field: Draft, pattern: false }
+    fields:
+      - { name: Title, label: タイトル, widget: string }
+      - name: Draft
+        label: 下書き
+        widget: boolean
+        default: true
+        required: false
+        hint: オンのあいだは公開されません。公開するときはオフにして保存します
+      - { name: Category, label: カテゴリ, widget: list, required: false }
+      - name: Date
+        label: 公開日時
+        widget: datetime
+        format: 'YYYY-MM-DDTHH:mm:ssZ'
+        default: '{{now}}'
+      - name: URL
+        label: URL
+        widget: string
+        default: 'https://blog.neko3cs.net/entry/'
+        hint: 最後に、半角の英小文字・数字・ハイフンで、記事の名前（スラッグ）を足します。ファイル名になるため、保存したあとは変えないでください
+        pattern:
+          - '^https://blog\.neko3cs\.net/entry/[a-z0-9]+([.-][a-z0-9]+)*$'
+          - 'https://blog.neko3cs.net/entry/ のあとに、英小文字・数字・ハイフンで記事の名前を入れてください'
+      - name: body
+        label: 本文
+        widget: markdown
+        # 記事は <iframe> の埋め込みやリンクカードなど、Markdown の拡張を使っている。
+        # リッチテキストでは書き換わることがあるので、既定は Markdown のまま編集する
+        modes: [raw, rich_text]
+
+  - name: entry-hatena
+    label: はてなブログ時代の記事
+    label_singular: 記事
+    folder: content/entry
+    extension: md
+    format: yaml-frontmatter
+    nested:
+      depth: 4
+    identifier_field: Title
+    summary: '{{Title}}'
+    filter:
+      field: URL
+      pattern: '^https://blog\.neko3cs\.net/entry/\d{4}/'
+    create: false
+    delete: false
+    sortable_fields:
+      fields: [Date, Title]
+      default:
+        field: Date
+        direction: descending
+    fields:
+      - { name: Title, label: タイトル, widget: string }
+      - { name: Category, label: カテゴリ, widget: list, required: false }
+      - name: Date
+        label: 公開日時
+        widget: datetime
+        format: 'YYYY-MM-DDTHH:mm:ssZ'
+      - name: URL
+        label: URL
+        widget: string
+        hint: ファイルの場所と対応しているため、変更しないでください
+      - name: body
+        label: 本文
+        widget: markdown
+        modes: [raw, rich_text]

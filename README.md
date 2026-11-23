@@ -93,9 +93,54 @@ X の投稿の「埋め込む」でコピーした `<blockquote>` を、Markdown
 
 ### 下書き
 
-公開しない下書きは `content/drafts/` に置きます。`content/entry/` の外なので、ビルドの対象にならず、サイトにも sitemap にも出ません。
+公開しない下書きは、`content/entry/` に置き、frontmatter に `Draft: true` を付けます。サイトにも、sitemap にも、フィードにも出ません。frontmatter の `Date` と `URL` は、下書きでも入れておきます（`URL` は、ファイルの場所と合わせます）。
 
-公開するときは、frontmatter に `Date` と `URL` を足し、`Draft: true` を消して、URL と同じパスで `content/entry/` に移します。本文の見出しは `##` から始めます（`#` は記事タイトルに使われるため）。
+公開するときは、`Draft: true` を消します（管理画面では、「下書き」をオフにして保存します）。本文の見出しは `##` から始めます（`#` は記事タイトルに使われるため）。
+
+下書きの本文・タイトル・URL は、ビルドの出力に含まれません（`src/server/exclude-drafts.ts` が取り除きます）。ただし、ファイル名（スラッグ）は、出力の JavaScript に残ります。公開前の記事の名前を知られたくないときは、スラッグに内容が分からない名前を使ってください。
+
+frontmatter とファイルの場所の間違いは、`pnpm check:frontmatter` で確かめられます。デプロイの前にも自動で実行され、通らないと公開されません。
+
+## 記事をブラウザから書く
+
+`https://blog.neko3cs.net/admin/` の管理画面（[Sveltia CMS](https://github.com/sveltia/sveltia-cms)）から、記事を書けます。GitHub でログインし、保存すると、`main` にコミットされます。コミットされると自動でデプロイされ、1〜2分ほどで公開されます。
+
+- **ログインできるのは、`neko3cs` だけ。** 受け口の Worker（`workers/cms-auth`）が、ログインしたユーザー名を確かめ、`neko3cs` 以外にはトークンを渡しません。トークンの権限は `public_repo` に固定しています。
+- **新しい記事。** タイトル、URL、本文を入れます。URL は、初めから入っている `https://blog.neko3cs.net/entry/` の後ろに、記事の名前（スラッグ。英小文字・数字・ハイフンで、ドットも使えます）を足します。スラッグがそのままファイル名（`content/entry/<スラッグ>.md`）になるため、保存したあとは変えないでください。「下書き」は、初めはオンです。公開するときにオフにして保存します。
+- **本文は、Markdown のまま編集します。** リッチテキストに切り替えると、`<iframe>` の埋め込みやリンクカードなどが書き換わることがあります。
+- **一覧は2つに分かれます。** 「記事」は URL が `/entry/<スラッグ>` の記事です。「はてなブログ時代の記事」は `/entry/2020/03/30/002449` 形式の記事で、新規作成と URL の変更はできません（URL を作り直すと、ファイルの場所と合わなくなるため）。
+- **画像。** `public/images/uploads/` に保存され、本文からは `/images/uploads/<ファイル名>` で参照します。
+- **自動保存はありません。** 保存せずにタブを閉じると、書きかけは消えます。
+
+### 初めて使うときの準備
+
+一度だけ、次の3つを行います。
+
+1. **GitHub の OAuth App を作ります。** GitHub の Settings → Developer settings → OAuth Apps → New OAuth App で、次のように入れます。
+   - Homepage URL: `https://blog.neko3cs.net`
+   - Authorization callback URL: `https://neko3cs-blog-cms-auth.neko3cs.workers.dev/callback`
+
+   作ったら、Client ID と、「Generate a new client secret」の Client secret を控えます。
+2. **受け口の Worker に、Client ID と Client secret を登録します。** Worker は `main` へのマージで自動デプロイされるので、デプロイされたあとに実行します（コマンドの実行中に、値を入力します）。
+
+   ```bash
+   pnpm exec wrangler secret put GITHUB_CLIENT_ID --config workers/cms-auth/wrangler.jsonc
+   ```
+
+   ```bash
+   pnpm exec wrangler secret put GITHUB_CLIENT_SECRET --config workers/cms-auth/wrangler.jsonc
+   ```
+3. **`main` のルールセットに、自分を例外として足します。** `main` は「PR 必須」のため、このままだと、管理画面から直接コミットできません。GitHub の Settings → Rules → Rulesets → 「Protect main branch」→ Bypass list → Add bypass で、「Repository admin」を「Always」で足します。ブランチの削除と強制 push の禁止は、そのまま全員に効きます。
+
+### Sveltia CMS を更新するとき
+
+`public/admin/index.html` で、バージョンと `integrity` を一緒に変えます。公開から2週間ほど経ったバージョンを選びます。
+
+```bash
+curl -sL https://unpkg.com/@sveltia/cms@<バージョン>/dist/sveltia-cms.js | openssl dgst -sha384 -binary | openssl base64 -A
+```
+
+出てきた値の先頭に `sha384-` を付けたものが、`integrity` です。管理画面を更新したら、ログインと保存ができることを確かめてください。
 
 ## 移行用のスクリプト
 

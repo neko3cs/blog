@@ -1,0 +1,15 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  // 記事の管理画面（Sveltia CMS）の GitHub ログインの受け口（Issue #20）。ブログ本体の Worker とは別に配信する
+  "name": "neko3cs-blog-cms-auth",
+  "main": "src/index.js",
+  "compatibility_date": "2026-11-01",
+  "workers_dev": true,
+  "vars": {
+    // このユーザーだけにトークンを渡す
+    "ALLOWED_USER": "neko3cs",
+    // このオリジンの管理画面だけにトークンを渡す（カンマ区切り）
+    "ALLOWED_ORIGINS": "https://blog.neko3cs.net"
+  }
+  // GITHUB_CLIENT_ID と GITHUB_CLIENT_SECRET は Secret として登録する（README の「記事をブラウザから書く」）
+}

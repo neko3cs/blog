@@ -1,5 +1,7 @@
 ---
 Title: IDDD 本 2 章を読んだのでアウトプットする
+Date: 2026-11-22T09:51:03+09:00
+URL: https://blog.neko3cs.net/entry/iddd-chapter-2
 Draft: true
 ---
 

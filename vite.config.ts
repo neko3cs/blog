@@ -3,6 +3,7 @@ import analog from '@analogjs/platform';
 import tailwindcss from '@tailwindcss/vite';
 
 import { archivePaths, readEntries } from './src/server/entries.ts';
+import { excludeDraftEntries } from './src/server/exclude-drafts.ts';
 import { linkCardsExtension } from './src/server/link-cards.ts';
 
 export default defineConfig(() => ({
@@ -13,6 +14,8 @@ export default defineConfig(() => ({
     mainFields: ['module'],
   },
   plugins: [
+    // 下書きの本文を、ビルドの出力（誰でも取得できる assets/）に含めない
+    excludeDraftEntries(),
     analog({
       // サーバーを出力せず、プリレンダーした静的ファイルだけを出力する
       static: true,
