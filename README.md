@@ -47,6 +47,32 @@ pnpm preview
 
 YouTube・SlideShare・Speaker Deck は、各サービスの「埋め込む」でコピーした `<iframe>` の HTML を、Markdown にそのまま貼ります。スマホでは画面幅に縮み、YouTube は 16:9 の比率を保ちます。
 
+### リンクカード
+
+段落にリンクを1つだけ置くと、リンク先のタイトル・説明・ドメインを並べたカードで表示されます。カードのタイトルには、リンクの文字が使われます。
+
+```markdown
+[GitHub - neko3cs/PSSQLBulkCopy](https://github.com/neko3cs/PSSQLBulkCopy)
+```
+
+リンク先の情報は `content/link-cards.json` に保存してあり、ビルドではリンク先にアクセスしません。他のサイトの画像を管理しないよう、サムネイルは出しません。新しいリンクを書いたら、次のコマンドで情報を取得します（情報は、はてなブログのリンクカードと同じ hatenablog-parts.com から取ります）。
+
+```bash
+pnpm fetch:link-cards
+```
+
+情報を取得できなかったリンクは、普通のリンクのまま表示されます。このサイトの記事へのリンク（`/entry/…`）は、取得しなくても記事のタイトルと冒頭の文からカードを作ります。
+
+### X の投稿
+
+X の投稿の「埋め込む」でコピーした `<blockquote>` を、Markdown の引用にして貼ります。最後の段落を「— 名前 (@ID) [日付](投稿のURL)」にすると、カードで表示されます。X の JavaScript は読み込みません。
+
+```markdown
+> 投稿の文章
+>
+> — ねこ (@neko3cs) [2019年4月10日](https://twitter.com/neko3cs/status/1115953437726740481)
+```
+
 ### 下書き
 
 公開しない下書きは `content/drafts/` に置きます。`content/entry/` の外なので、ビルドの対象にならず、サイトにも sitemap にも出ません。
@@ -61,6 +87,7 @@ YouTube・SlideShare・Speaker Deck は、各サービスの「埋め込む」�
 | `pnpm baseline` | はてなブログの全URLのステータス・title・canonical を `migration/baseline.csv` に記録する |
 | `pnpm check:urls <URL>` | 記録した全URLを新サイトに問い合わせ、はてなと同じ title・canonical で返るかを確認する |
 | `pnpm check:content` | ビルドした記事の本文に、はてなの本文の文がすべて含まれているかを確認する |
+| `pnpm fetch:link-cards` | リンクカードに出すリンク先の情報を取得し、`content/link-cards.json` に保存する。`--refresh` で取得し直す |
 
 ```bash
 pnpm preview

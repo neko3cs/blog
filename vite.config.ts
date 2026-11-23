@@ -3,6 +3,7 @@ import analog from '@analogjs/platform';
 import tailwindcss from '@tailwindcss/vite';
 
 import { archivePaths, readEntries } from './src/server/entries.ts';
+import { linkCardsExtension } from './src/server/link-cards.ts';
 
 export default defineConfig(() => ({
   build: {
@@ -17,6 +18,8 @@ export default defineConfig(() => ({
       static: true,
       content: {
         highlighter: 'shiki',
+        // リンクカードと X の投稿のカード（Issue #6）
+        markedOptions: { extensions: [linkCardsExtension()] },
         shikiOptions: {
           highlighter: {
             themes: ['github-light'],
