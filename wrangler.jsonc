@@ -2,6 +2,11 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "neko3cs-blog",
   "compatibility_date": "2026-11-01",
+  // 本番。DNS の blog の CNAME（→ hatenablog.com）のプロキシをオンにすると、このルートで Worker が受ける。
+  // プロキシをオフに戻せば、はてなブログに戻る（切り替えの手順は docs/migration-plan.md の Phase 4）
+  "routes": [{ "pattern": "blog.neko3cs.net/*", "zone_name": "neko3cs.net" }],
+  // routes を書くと workers.dev が既定で無効になるため、プレビュー用に明示的に有効にする（noindex は public/_headers）
+  "workers_dev": true,
   "assets": {
     "directory": "./dist/analog/public",
     // entry/foo.html を /entry/foo で返し、/entry/foo.html と /entry/foo/ は /entry/foo へ寄せる
