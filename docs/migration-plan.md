@@ -201,7 +201,10 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
   - `title` が Phase 0 の記録と一致すること
   - `noindex` が、`*.workers.dev` では付いていて、それ以外（本番・ローカル）では付いていないこと
 - [x] `.` を含む slug、日本語カテゴリ、`/feed`、`/rss` の Content-Type を個別に確認する（`.` を含む2記事、`シェル`・`SQL Server`・`.NET`・`C#`・`ローコード/ノーコード`、日別アーカイブが 200。フィードは `application/atom+xml`・`application/rss+xml`）
-- [ ] 重点確認リストの記事を目視で確認する（コードブロック、画像、埋め込み）
+- [x] 重点確認リストの記事を目視で確認する（コードブロック、画像、埋め込み）。2026-11-23 に `*.workers.dev` で確認した
+  - Search Console の流入上位7記事: 画像（計5枚）がすべて 200 で表示され、コードブロックは Shiki でハイライトされ、Markdown の記号が本文に残っていない
+  - Speaker Deck の埋め込みとリンクカードのある記事（`join-report-of-codeer-lowcode-blazor`）: 埋め込みが 16:9 で表示される
+  - 流入1位の `work-with-depression-2-times-2026`: スマホ幅（375px）で横にはみ出さない
 - [x] プレビュー環境は `noindex` にして、重複コンテンツとしてクロールされないようにする（`public/_headers` で `*.workers.dev` のホストにだけ `X-Robots-Tag: noindex` を付ける。本番のホストには付かないので、切り替え時に外す作業はない）
 - [ ] Google のリッチリザルトテストで、記事ページの構造化データを確認する
 
