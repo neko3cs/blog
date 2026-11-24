@@ -1,0 +1,142 @@
+---
+Title: 『.NET Core 3最新情報セミナー』に参加しました
+Category:
+- イベント参加
+- .NET Core
+- WPF
+- Infragistics
+- テスト自動化
+Date: 2019-09-26T18:25:40+09:00
+URL: https://blog.neko3cs.net/entry/dotnet-core-3-seminar-report
+---
+
+『.NET Core 3最新情報セミナー』に参加してきました。
+
+[.NET Core 3最新情報セミナー (2019/09/26 13:30〜)](https://connpass.com/event/134377/)
+
+セッション内容は以下な感じです。
+
+- .NET 最新ロードマップと今押さえておきたい技術要素
+- .NET Core 3.0時代のデスクトップアプリ開発戦略を考える
+- UIコンポーネントにおける .NET Core 3対応
+- .NET Core 3移行に向けてのテスト自動化戦略
+
+それぞれのセッションで気になった点をまとめたいと思います。
+
+## .NET 最新ロードマップと今押さえておきたい技術要素
+
+井上 章さん([@chack411](https://twitter.com/chack411))の発表。
+
+<div class="embed"><iframe src="https://www.slideshare.net/slideshow/embed_code/key/e8saA171GPJiYE" width="427" height="356" style="aspect-ratio: 427 / 356" loading="lazy" allowfullscreen></iframe></div>
+
+<strong>[.NET 最新ロードマップと今押さえておきたい技術要素](https://www.slideshare.net/chack411/net-176247290 ".NET 最新ロードマップと今押さえておきたい技術要素")</strong> from <strong>[Akira Inoue](https://www.slideshare.net/chack411)</strong>
+
+- .net core 3.0 for winodws desktopのメリット
+  - <strong>単一exeファイルにまとめられる！</strong>
+  - 未参照なライブラリの排除
+- app centerに.net core for windows desktopが対応
+  - desktop appもテレメトリとかクラレポが取れる！
+- blazor app
+  - 2つのホスティングモデル
+    - **signalr通信で実行するホスティングモデル**
+    - wasmを使ったホスティングモデル
+  - wasm版はまだpreview（2020-05 GA!）
+  - <strong>コンポーネント指向な実装も可能！</strong>
+    - とても興味がある(\*'ω')
+- aspnet core 3.0でgrpcとservice workerに対応！
+- c#だけでwebアプリのフロントからバックエンドまで実装可能に！
+- ml.net - 機械学習
+  - 感情分析、価格予測、スパム判定とかで使える
+  - ml.net model builder
+    - visual studioでモデル作成が出来る
+- .net 5で分散した.netを1つに統合する
+- .net 5に統合されないもの
+  - webforms
+    - blazorで代替
+  - wcf
+    - gRPC for WCF server and remotingで代替（移行ガイド公開予定）
+  - wf
+    - open source core workflow for windows workflowで代替
+
+## .NET Core 3.0時代のデスクトップアプリ開発戦略を考える
+
+中村 充志さん([@nuits\_jp](https://twitter.com/nuits_jp))の発表。
+
+[nuitsjp/Desktop-App-Dev-Storategy-in-.NET-Core-3.0](https://github.com/nuitsjp/Desktop-App-Dev-Storategy-in-.NET-Core-3.0)
+
+- .net 5が出るからと言って本当の意味ですべてが統合されるわけではない
+  - デスクトップにはデスクトップの、モバイルにはモバイルの最適なruntimeが使われるべき
+- .net core 3.0からの新しいビルド設定
+  - `/p:PublishReadyToRun=true`
+    - AOTコンパイルが可能 -> 早くなる
+  - <strong>`--self-contained=false`</strong>
+    - シングルバイナリにはなるけど、ランタイムは同梱しない
+- .net core 3.0によるアーキテクチャ戦略
+  - Side by SideやPublishSingleFileによるモジュール分割
+    - モジュール毎にruntimeを変更出来る
+    - 実行ファイルが分かれるので影響範囲が抑えられる
+- MSIX
+  - 新しいパッケージインストーラー
+  - XAML Islandとかでuwpのコントロール使うときはMSIXでパッケージングしないとだめ
+- .NET Framework -> .NET Coreへの移行の注意点
+  - Frameworkにあったライブラリがnugetに移行されている　->　手動で取り直さないといけない
+  - **Core用に移行されたライブラリが大きく変更されている可能性がある**
+    - 例：EF Core -> 発行クエリの仕様が大きく変わっているのでパフォーマンスに影響するかも？
+
+## UIコンポーネントにおける .NET Core 3対応
+
+池原 大然さん([@neri78](http://twitter.com/neri78))の発表。
+
+<div class="embed"><iframe src="https://www.slideshare.net/slideshow/embed_code/key/Ka4v06L2zOedsA" width="427" height="356" style="aspect-ratio: 427 / 356" loading="lazy" allowfullscreen></iframe></div>
+
+<strong>[UIコンポーネントにおける .NET Core 3対応](https://www.slideshare.net/IGJP/ui-net-core-3 "UIコンポーネントにおける .NET Core 3対応")</strong> from <strong>[インフラジスティックス・ジャパン株式会社](https://www.slideshare.net/IGJP)</strong>
+
+- Infragisticsのコントロールはクロスプラットフォーム！
+  - Core APIにより、デスクトップ、Web、モバイルどのプラットフォームでも同じ設計思想のコントロールが使える
+  - <strong>どのプラットフォームでも機能は同じ！違うのはコードだけ！</strong>
+- .net core 3.0対応済み！
+  - 現在はwpfのみ
+  - nugetから利用可能（ただしライセンスは買ってネ）
+- これからの予定
+  - 2019-Q4でWin, ASP.NET MVCへ対応
+  - ASP.NET MVCは一部機能で対応
+    - Excel, Word, PDF出力等ネイティブの機能に依存するものは検討中
+- ~本セミナーに参加してくれた人はライセンス値引きするよ！~
+
+## .NET Core 3移行に向けてのテスト自動化戦略
+
+石川 達也さん([@StoneGuitar777](http://twitter.com/StoneGuitar777))の発表。
+
+- **仕様化テスト**
+  - 前回の出力結果を正として、再テスト時に突き合わせするテスト方法
+  - 自動化しやすい
+- 移行案件とかでテストの範囲が大きいときとても有効
+- システムテストのレベルで自動化するとカバレッジを稼ぎやすい
+- どれくらい作ればいいの？
+  - カバレッジで判断（システムテストでは難しいかも？）
+  - UIのレイアウト崩れは1回は目で確認 -> 以後は仕様化テスト
+  - 仕様にプライオリティを付けてテストの粒度をコントロールする
+- Friendly！
+  - .net coreに対応したテストライブラリ
+  - プロセスを取得してオブジェクトを直接参照することでテストする
+  - <strong>.net framework用に作ったFriendlyのテストコードをそのまま.net core移行アプリで利用可能</strong>
+- Friendlyはどうやって別プロセスのオブジェクトを参照しているか
+  - HostAPIでdotnetのdllを読み込む
+  - 要求を受け付けるdotnetサーバ(runtime?)にapi実行を要求
+- .netのdllは実行runtimeに応じて使用するシステムライブラリを切り替えてる?!
+  - .net framework用に作ったdllを.net coreから実行するとSystem名前空間とかも.net coreのものを使ってくれる
+  - 逆も然り
+- selenium
+  - webテスト自動化ツール
+  - Friendlyではseleniumを活用してwebのテストを実施してる
+- domにidを振っておくことでwebでもでテスト可能
+- **test assistant pro**
+  - テストコード実装補助ツール
+    - seleniumとFriendlyの使い方は知ってる必要がある
+  - 実行中のユーザのUI操作からテストコードを自動生成してくれる
+
+## 所感
+
+.net core 3.0の登場によりc#でのアプリケーション開発の幅がとても広がったように感じました。 .net core 3.0による新しいビルド設定は地味ではありますが、とても嬉しい機能ですね。 特にblazorの正式リリースにより、フロントエンドからバックエンドまでフルスタックにc#での開発が可能になった点はとても興味深いです。 また、Friendlyによるwpfのテスト自動化はテストで可能な限り楽をしたい私にとってはとてもおいしい情報でした。
+
+来年には.net 5がリリースされます。.netの進化に置いて行かれないように頑張りたいと思いました。

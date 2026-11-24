@@ -85,8 +85,25 @@ for (const file of files) {
   }
 }
 
+// 日付形式のURLからの転送（public/_redirects）。移転先の記事がなくなると、古いURLが 404 になるため確かめる。
+// 転送元に今も記事があると、転送が記事より優先されて、記事が表示されなくなる
+const redirects = readFileSync(join(ROOT, 'public/_redirects'), 'utf8')
+  .split('\n')
+  .map((line) => line.trim())
+  .filter((line) => line !== '' && !line.startsWith('#'))
+  .map((line) => line.split(/\s+/));
+const entryPaths = new Set([...seenUrls.keys()].map((url) => new URL(url).pathname));
+for (const [from, to] of redirects) {
+  if (entryPaths.has(from)) {
+    errors.push(`public/_redirects: 転送元 ${from} に記事があります（転送が優先され、記事が表示されません）`);
+  }
+  if (!entryPaths.has(to)) {
+    errors.push(`public/_redirects: 転送先 ${to} の記事がありません（${from} が 404 になります）`);
+  }
+}
+
 if (errors.length > 0) {
   console.error(`✘ ${errors.length} 件の問題があります\n\n${errors.join('\n')}`);
   process.exit(1);
 }
-console.log(`✔ ${files.length} 件の記事の frontmatter と置き場所に問題はありません`);
+console.log(`✔ ${files.length} 件の記事の frontmatter と置き場所に問題はありません（転送 ${redirects.length} 件も、移転先の記事があります）`);

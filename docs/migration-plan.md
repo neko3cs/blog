@@ -76,6 +76,14 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 `povo2.0` のように `.` を含む slug が拡張子と誤認されないかは、`change-to-povo2.0-from-ahamo` で `wrangler dev` 上は問題ないことを確認済みです。本番の Cloudflare でも、第6章の検証スクリプトで改めて確認します。
 
+### 3.2.1 日付形式のURLをスラッグ形式へ移す（移行後の変更）
+
+移行後に、はてなブログ時代の日付形式のURL（`/entry/2020/03/30/002449`、54件）を、他の記事と同じスラッグ形式（`/entry/<slug>`）へ改めました。記事ファイルの名前と frontmatter の `URL` を変え、旧URLは `apps/blog/public/_redirects`（Workers の静的アセットの転送）で新URLへ 301 で転送します。本文中の内部リンクも新URLに直しました。
+
+- 旧URLの 301 は、`pnpm check:urls` が `migration/baseline.csv` の旧URLについて確かめます（旧URL → 301 → 新URLが 200 で同じ title）。
+- 移転先の記事がない転送や、転送元に記事が残っている転送は、`pnpm check:frontmatter` が検出します。
+- Search Console では、サイトのURL（ドメイン）単位のため、アドレス変更ツールは不要です。サイトマップを再送信すると、新URLの認識が早まります。
+
 ### 3.3 Analog の実装上の注意点（試作で判明）
 
 | 注意点 | 対応 |

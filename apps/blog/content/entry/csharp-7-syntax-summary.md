@@ -1,0 +1,170 @@
+---
+Title: C# 7.0 構文まとめ
+Category:
+- C#
+Date: 2018-12-02T18:20:14+09:00
+URL: https://blog.neko3cs.net/entry/csharp-7-syntax-summary
+---
+
+C#ってどんどん進化していくので意外と知らない構文があったりします。 特に最新のC# 7.0は業務で使用出来ない都合上知らない構文ばかりです。
+
+なので、今の段階で最新構文のうち実用性の高そうなものをまとめておこうと思います。
+
+## outパラメータ付き引数での変数宣言
+
+従来のC#ではoutパラメータを使用する前に、変数宣言をする必要性がありました。
+
+```csharp
+static void Main(string[] args)
+{
+    int x;
+    Initialize(out x);
+
+    Console.WriteLine($"x = {x}");  // x = 100
+}
+
+static void Initialize(int x) => x = 100;
+```
+
+それが7.0では引数渡しと同時に行うことが出来るようになりました。
+
+```csharp
+static void Main(string[] args)
+{
+    Initialize(out var x);
+
+    Console.WriteLine($"x = {x}");  // x = 100
+}
+
+static void Initialize(int x) => x = 100;
+```
+
+ちなみに、if文内部で宣言されたout varはif文と同じスコープになるそうです。
+
+```csharp
+static void Main(string[] args)
+{
+    if (int.TryParse("100", our var num))
+    {
+         Console.WriteLine("変換だめでした");
+    }
+
+    Console.WriteLine($"num = {num}");  // num = 100
+}
+```
+
+## パターンマッチング
+
+C#7.0ではis演算子が拡張されて比較演算の可読性が上がっています。 "=="演算子の代わりにis演算子を使うことが出来ます。
+
+```csharp
+static bool IsValid(object str)
+{
+    if (str is null) return false;
+    if (str is int.MinValue) return false;
+    if (str is "hoge") return false;
+
+    return true;
+}
+```
+
+また、is演算子だけではなく、switch文も拡張されて型やvar変数によるメソッドでの判定も出来るようになりました。
+
+```csharp
+static void PrintShape(object shape)
+{
+    switch (shape)
+    {
+        case Circle c:
+            Console.WriteLine("It is Circle.");
+            break;
+        case Rectangle s when (s.Height == s.Width):    // when句の条件に引っかかるRectangle型のみ
+            Console.WriteLine("It is Square.");
+            break;
+        case Rectangle r:
+            Console.WriteLine("It is Rectangle.");
+            break;
+        case var i when IsDebug(i):
+            Console.WriteLine("Debug now.");
+            break;
+        default:
+            throw new ArgumentException();
+            break;
+    }
+}
+```
+
+## ローカル関数
+
+C# 6.0でもFuncとかActionとかありましたが、再帰処理する場合、事前に宣言が必要でした。
+
+```csharp
+static void Main(string[] args)
+{
+    Func<int, int> func = null;
+    func = n => n >= 1 ? n * func(n - 1) : 1;
+    Console.WriteLine("result: {func(100)}");  // result: 3628800
+}
+```
+
+ローカル関数を使うことで最初の無駄な変数宣言を省略出来ます。
+
+```csharp
+static void Main(string[] args)
+{
+    int func(int n) => n >= 1 ? n * func(n - 1) : 1;
+    Console.WriteLine("result: {func(100)}");  // result: 3628800
+}
+```
+
+定義はラムダ式である必要はないようです。
+
+```csharp
+static Task<int> cashe;
+
+static void Main(string[] args)
+{
+    async Task<int> inner()
+    {
+        await Task.Delay(3000);
+        return 1;
+    }
+    cashe = cashe ?? inner();
+
+    Console.WriteLine($"cashe: {cashe.Result}");
+}
+```
+
+## スロー式
+
+throwは文でしたが、C# 7.0からは式としても使用できるようになりました。 ただし、使用できる条件は限定的です。
+
+- ラムダ式`=>`の後
+- 三項演算子の値
+- Null合体演算子の値
+
+```csharp
+class Person
+{
+    public string Name { get; set; }
+    public string FirstName
+    {
+        get
+        {
+            var parts = Name.Split(' ');
+            return (parts.Length > 0) ? parts[0] : throw new InvalidOperationException("No name!");
+        }
+    }
+    public string LastName
+    {
+        get
+        {
+            var parts = Name.Split(' ');
+            return (parts.Length > 0) ? parts[1] : throw new InvalidOperationException("No name!");
+        }
+    }
+    public int Age => throw new NotImplementedException();
+
+    public Person(string name) => Name = name ?? throw new ArgumentNullException(name);
+}
+```

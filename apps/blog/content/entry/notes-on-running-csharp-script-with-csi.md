@@ -1,0 +1,44 @@
+---
+Title: csiコマンドでのC#スクリプト実行時の注意点
+Category:
+- .NET Core
+- C#Script
+- 備忘録
+Date: 2019-03-28T23:23:54+09:00
+URL: https://blog.neko3cs.net/entry/notes-on-running-csharp-script-with-csi
+---
+
+C#にはスクリプトとして実行出来る機能があります。 `csi`コマンドを使用することでC#のスクリプトファイルである.csxファイルを実行出来ます。
+
+冷静に考えると当たり前なことですが、私はハマったので備忘録に残します。
+
+スクリプトの最後は`void`か`int`を返しましょう。 `int`を返す場合は終了コードとして認識します。 当たり前ですね。
+
+```csharp
+// SampleScript.csx
+using System;
+
+public static class Script
+{
+    public static string Run()
+    {
+        // 例として現在時間を返すスクリプトを作成する
+        var now = DateTime.Now;
+        return now.ToString("yyyy-MM-dd HH:mm:ss");
+    }
+}
+
+// csiから実行すると"string"を"int"に変換出来ないよエラー(CS0029)が出る
+// return Script.Run();
+
+// デバッグでcsiから実行するときは以下のようなConsole.WriteLineするコードを書く
+#region DEBUG
+var ret = Script.Run();
+Console.WriteLine($"return value: {ret}");
+return 0;
+#endregion
+```
+
+`Microsoft.CodeAnalysis.CSharp.Scripting`というNugetパッケージを追加するとC#コード上でC#スクリプトを実行出来るようになります。 上記パッケージの`CSharpScript`クラスで実行する場合はコメントアウトした`return Script.Run();`で結果を受け取ることが出来ます。
+
+ですが、`csi`コマンドから実行する場合はMainメソッド同様、終了コードが必要なので気をつけましょう。(戒め)

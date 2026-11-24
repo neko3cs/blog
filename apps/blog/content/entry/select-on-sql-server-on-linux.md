@@ -1,0 +1,110 @@
+---
+Title: SQL Server on LinuxでSELECTするまで
+Category:
+- SQL Server
+- Docker
+Date: 2019-04-14T01:07:03+09:00
+URL: https://blog.neko3cs.net/entry/select-on-sql-server-on-linux
+---
+
+今更ですが、DockerでSQL ServerをmacOSやLinuxでも使えるようになりましたので、 起動と設定、それからGUIツールを使ってデータをSELECTするところまでやってみたいと思います。
+
+なお、環境はmacOS Mojaveとし、Dockerが入っていることを前提とします。 また、GUIツールはAzure Data Studioを使用します。
+
+## SQL Server on Linux Dockerの起動
+
+まずは、SQL ServerのDocker imageを落とします。
+
+```shellscript
+$ sudo docker pull mcr.microsoft.com/mssql/server:latest
+```
+
+そしたら、以下のコマンドでイメージを実行します。
+
+```shellscript
+$ sudo docker run \
+   -e 'ACCEPT_EULA=Y' \
+   -e 'SA_PASSWORD={Your SA Account Password}' \
+   -p 1433:1433 \
+   --name sql1 \
+   -d mcr.microsoft.com/mssql/server:latest
+```
+
+ここでパラメータの意味は以下のようになります。
+
+| パラメータ | 意味 |
+| --- | --- |
+| \-e 'ACCEPT\_EULA\=Y' | 使用許諾契約書の承諾を確定 |
+| \-e 'SA\_PASSWORD={Your SA Account Password}' | SQL Serverのsaアカウントのパスワードの初期設定 |
+| \-p 1433:1433 | 使用ポート設定 |
+| \--name sql1 | コンテナの名称設定 |
+| \-d mcr.microsoft.com/mssql/server:latest | 指定のイメージをバックグラウンドで起動 |
+
+以下のコマンドで実行出来たか確認します。
+
+```shellscript
+$ sudo docker ps -a
+```
+
+ついでに起動を確認したらコンテナに入ってみましょう。
+
+```shellscript
+$ sudo docker exec -it sql1 "bash"
+```
+
+以下のような結果で起動が確認出来たらおっけーです。
+
+![f:id:neko3cs:20190414005328p:plain](/images/20190414/20190414005328.png)
+
+ちなみに、コンテナから抜けるには`exit`コマンドを使用します。
+
+## SQL Server on Linux Dockerへの接続とSELECT
+
+Azure Data Studioを起動します。 起動したら以下の情報を入力して接続します。 ここでのパスワードはDockerコンテナを実行した際に設定したパスワードになります。
+
+![f:id:neko3cs:20190414005354p:plain](/images/20190414/20190414005354.png)
+
+接続すると以下のような画面が開かれます。
+
+![f:id:neko3cs:20190414005824p:plain](/images/20190414/20190414005824.png)
+
+そしたら以下のSQLを実行して確認用のDB、テーブルを作成しましょう。 作成と同時にサンプルのレコードも追加します。
+
+```sql
+CREATE DATABASE SampleDB
+SELECT Name from sys.Databases
+GO
+
+USE SampleDB
+GO
+
+CREATE TABLE Person
+(
+    id INT,
+    name NVARCHAR(50),
+    age INT
+)
+INSERT INTO Person
+(
+    id,
+    name,
+    age
+)
+VALUES
+(
+    1,
+    'neko3cs',
+    25
+)
+GO
+```
+
+正常に実行出来ると以下のような画面が表示されます。
+
+![f:id:neko3cs:20190414005853p:plain](/images/20190414/20190414005853.png)
+
+最後にテーブルをSELECTしてみます。
+
+![f:id:neko3cs:20190414010009p:plain](/images/20190414/20190414010009.png)
+
+これで取り敢えずmacOSでもSQL Serverを使用できる環境が整いました！ ちょっとした開発の確認やテストで使用したい場合などに有効だと思いますのでどんどん活用していきましょう。

@@ -1,0 +1,296 @@
+---
+Title: LINQのススメ
+Category:
+- C#
+- LINQ
+- 迷える子羊
+Date: 2019-02-22T19:56:45+09:00
+URL: https://blog.neko3cs.net/entry/recommend-linq
+---
+
+LINQが登場して10年、LINQはかなり熟成、安定した技術になっています。
+
+ですが、新規C#erやC#2.0で知識が止まっている人などおり、布教活動に休みはありません。 そんな迷える子羊達にLINQの教えを唱えます。
+
+## LINQとは
+
+LINQは統合言語クエリ（Language INtegrated Query）の略称です。 DB、Xml、その他Webサービスなど、.NET言語におけるデータアクセス方法を統合する機能を差します。
+
+基本はコレクションに対して処理を行う、foreachの強い版です。 foreach文やif文いっぱい書かないといけないような処理を少ないコード量で読みやすく実現します。
+
+LINQがどれほど完結でわかりやすいものかは以下のコードを参考にしてください。
+
+まずは従来のコードです。
+
+```csharp
+static void Main(string[] args)
+{
+    foreach (var num in Enumerable.Range(0, 100))
+    {
+        if (num % 3 == 0 && num % 5 == 0)
+        {
+            Console.Write("FizzBuzz, ");
+        }
+        else if (num % 3 == 0)
+        {
+            Console.Write("Fizz, ");
+        }
+        else if (num % 5 == 0)
+        {
+            Console.Write("Buzz, ");
+        }
+        else
+        {
+          Console.Write($"{num}, ");
+        }
+    }
+}
+```
+
+これが、以下のようになります。
+
+```csharp
+static void Main(string[] args)
+{
+    var query = from num in Enumerable.Range(0, 100)
+                select num % 3 == 0 && num % 5 == 0 ? "FizzBuzz" :
+                       num % 3 == 0 ? "Fizz" :
+                       num % 5 == 0 ? "Buzz" :
+                       num.ToString();
+    foreach (var fizzbuzz in query) Console.Write($"{fizzbuzz}, ");
+}
+```
+
+正直FizzBuzz程度ではこの程度の違いしか感じられませんが、主要なコードがぎゅっと固まって可読性が高まってます。 上記のコードにより文法さえ理解していれば、LINQを使うことでよりシンプルで分かりやすいコードになっていること理解出来るかと思います。
+
+## LINQの持つ機能
+
+LINQでよく使う基本機能として以下の5つの機能があります。
+
+| 機能 | LINQ構文 | SQL構文(mssql) |
+| --- | --- | --- |
+| 逐次処理 | `from in` | `FROM` |
+| 射影 | `select` | `SELECT` |
+| 選択 | `where` | `WHERE` |
+| 並び替え | `orderby` | `ORDER BY` |
+| グループ化 | `group by into` | `GROUP BY` |
+
+『そうです。LINQはSQLです。』 この認識で**LINQ初級レベルの使用**には概ね支障はないと私は思います。 私自身、他の言語には見ないLINQ独特な記法はSQLを意識しているものだと思っています。 故にSQLを書ける人は概ねSQLの構文からLINQの機能も推測出来るかと思われます。
+
+SQLの様な宣言により処理を行うプログラミングスタイルのことを**宣言型プログラミング**と呼びます。 LINQは手続き型言語であるC#<sup id="fnref-8dd1227e"><a href="#fn-8dd1227e">\*1</a></sup>の中に宣言型プログラミングの記法を混ぜ込むシンタックスシュガーだと私は考えています。
+
+## SQLとの違い
+
+LINQとSQLが似ているとは言え、それは書き方、見た目の問題です。 LINQを覚えるに当たってSQLをベースに覚えるのは良いと思いますが、 当然別の言語であるため差分を理解する必要はあります。
+
+以下にその差分を示します。
+
+### 処理順序
+
+LINQとSQLでは処理順序が違います。
+
+SQLでは、
+
+1. `SELECT`
+2. `FROM`
+3. `WHERE`
+4. `GROUP BY`
+5. `ORDER BY`
+
+...と書き順が厳格に決まっており、その処理は、
+
+1. `FROM`
+2. `WHERE`
+3. `GROUP BY`
+4. `SELECT`
+5. `ORDER BY`
+
+...の順に処理されてゆきます。
+
+決まった位置に宣言して、欲しいデータを取得します。
+
+ですが、LINQの場合、あくまで手続き型なので上から順番に処理されてゆきます。
+
+概ね`from in`で始まり、`select`で終わりますがその間は処理したい順に書きます。 なんなら`from in`が複数回書かれることもあります。 要素の持つコレクションの中の要素の持つコレクションを逐次処理するとかですね。<sup id="fnref-1db4d9ca"><a href="#fn-1db4d9ca">\*2</a></sup>
+
+LINQではSQLと違って処理順序を考える必要があるという点が違います。 でも、普通にプログラミングしたことある人ならわかるレベルの難易度なので何の壁でもありません。
+
+### 遅延評価
+
+LINQには遅延評価という特性があります。 以下が遅延特性のサンプルプログラムになります。
+
+```csharp
+// 1. この時点ではまだ評価されてない
+var query = from num in Enumerable.Range(1, 100)
+            where num % 2 == 0
+            select num;
+
+// 2. ToList()でqueryの値が何なのか評価される
+query.ToList().ForEach(Console.WriteLine);
+```
+
+基本的にプログラムは記述された行のタイミングでCPUによって処理が評価され、結果がわかります。
+
+ですが、LINQは記述しただけではCPUによって値を評価されません。 LINQが評価されるタイミングは`foreach`文や、`ToList`、`First`のような値を確定させるメソッドを呼んだ際に評価されます。 上記の場合であれば、`ToList()`の呼び出されたタイミングで`List<int>`型の2の倍数のリストであることがわかります。
+
+どのメソッドを呼ぶと評価されるのかは以下のサイトを確認して見てください。
+
+- [クエリの実行#クエリの即時実行](https://docs.microsoft.com/ja-jp/dotnet/framework/data/adonet/ef/language-reference/query-execution#immediate-query-execution)
+
+## LINQの使い方
+
+正直な話、公式ドキュメントがしっかりしているので、一通り目を通せば概ねの使い方は把握出来ます。
+
+- [統合言語クエリ(LINQ)](https://docs.microsoft.com/ja-jp/dotnet/csharp/linq/)
+
+とはいえ、初心者に公式ドキュメントを全部読めというのも酷なのでよく使う機能の使い方を紹介しておきます。
+
+### 基本の文法
+
+#### 逐次処理と射影
+
+基本は以下の形式によってデータを取得します。
+
+```csharp
+var query = from num in Enumerable.Range(1, 100)
+            select num;
+```
+
+`from {変数名} in {コレクション名}`でデータを逐次的に処理することを宣言します。 ここでの変数名はコレクションの1要素を表します。
+
+`select`では取得したい値を宣言します。 今回のサンプルコードは`select`で返したい値が1つためシンプルに`num`を返します。 複数の値を返したい場合は**匿名型**というものを使って以下のように記述します。
+
+```csharp
+var query = from file in Directory.EnumerateFiles("/logs/")
+            from line in File.ReadAllLines(file)
+            select new
+            {
+                FileName = file,
+                LineText = line
+            };
+```
+
+[匿名型](https://docs.microsoft.com/ja-jp/dotnet/csharp/programming-guide/classes-and-structs/anonymous-types)は 読み取り専用なプロパティを持つクラスをその場で即席するイメージです。
+
+`select new { }`で複数の値を取る記述を以下のように頭の中で変換してください。
+
+```sql
+SELECT
+    file as file_name,
+    line as line_text
+FROM log_files
+```
+
+そうです。別名をつけているだけです。 LINQでは匿名型という記法によって別名をつけて1つの型として纏めます。
+
+#### 選択
+
+次に取得する値をフィルタリングしたい場合は`where`を使います。
+
+```csharp
+var query = from num in Enumerable.Range(1, 100)
+            where num % 2 == 0
+            select num;
+```
+
+上記では2で割り切れる数字のみ取得しています。 これはSQLと同様なので問題ないですね。
+
+#### グループ化
+
+グループ化は少し癖があります。
+
+```csharp
+var query = from item in Employees
+            group item.Salary by item.Grade into groupByGrade
+            select new
+            {
+                Grade = groupByGrade.Key,
+                SalaryAve = groupByGrade.Ave()
+            };
+```
+
+まず、`group {グループ化の対象プロパティ} by {グループ化するキー}`でグループ化の対象を決めます。 次に`into {グループの別名}`でグループに別名をつけて使用します。
+
+複数の値をキーにする場合は匿名型を使用します。
+
+```csharp
+var query = from item in Employees
+            group item.Salary by new
+            {
+                Grade = item.Grade,
+                Generation = (item.Age / 10 * 10)  // 10代, 20代, etc...
+            }
+            into groupByGrade
+            select new
+            {
+                Grade = groupByGrade.Key.Grade,
+                Generation = groupByGrade.Key.Generation,
+                SalaryAve = groupByGrade.Ave()
+            };
+```
+
+#### 並び替え
+
+最後に並び替えです。
+
+並び替えは`where`に同じく、SQLとそう変わりません。
+
+```csharp
+var query = from num in Enumerable.Range(1, 100)
+            orderby num descending
+            select num;
+```
+
+`ascending`が昇順で`descending`降順です。 並び替えたいタイミングで宣言しますが、大抵は`select`の直前だと思います。
+
+#### その他の機能の使い方
+
+公式の[標準クエリ演算子の概要 (C#)](https://docs.microsoft.com/ja-jp/dotnet/csharp/programming-guide/concepts/linq/standard-query-operators-overview)を読むのが一番良いです。 非常に分かりやすくまとまっています。
+
+でも、おそらく「重複を無くしたいな... `DISTINCT`かな？」とか「`TOP(100)`だけ欲しいな...LINQだとどう書くんだろう？」みたいな疑問から検索するとすぐに出ると思います。 ちなみに`TOP(100)`はLINQでは`Take(100)`メソッドを呼びます。
+
+## メソッド構文
+
+実はですね、LINQには今まで紹介した記法とは別の記法が存在します。
+
+それが**メソッド構文**という記法です。 正直こちらの方が他言語でコレクション操作を知っている方には馴染みがあるかも知れません。 今まで紹介してきた構文は**クエリ式構文**と言います。
+
+例えば遅延評価の項目で紹介した例文は以下のように記述出来ます。
+
+```csharp
+// クエリ構文
+var query = from num in Enumerable.Range(1, 100)
+            where num % 2 == 0
+            select num;
+
+// メソッド構文
+var query = Enumerable.Range(1, 100)
+                      .Where(num => num % 2 == 0)
+                      .Select(num => num);
+```
+
+メソッド構文では**ラムダ式**という`num => num % 2 == 0`の部分のような構文を使用します。 [ラムダ式](https://docs.microsoft.com/ja-jp/dotnet/csharp/programming-guide/statements-expressions-operators/lambda-expressions)は 正式には`(値) => {式}`の形式で記述し、デリゲートや式ツリーを作成するための匿名関数になります。
+
+でも、これも難しいことは考えず、初めは`Where()`なら`(値) => {条件式;}`と書く、`Select()`なら`(値) => {値を射影する式;}`と覚えるのが良いと思います。
+
+LINQの機能によってはクエリ式構文で書くことが出来ないものがあります。 例えば、以下のようなものが該当します。
+
+- `Union()`メソッド
+- `FirstOrDefault()`メソッド
+- `Max()`メソッド
+- `Distinct()`メソッド
+- etc...
+
+概ね値を評価するメソッドが該当します。 これらの違いは使いながら覚えつつ、可読性を意識して組み合わせられるといいですね。
+
+## まとめ
+
+ここまで新規C#erやC#2.0で知識が止まっている人に対してLINQの教えを唱えてきました。 C#を使っているのにLINQを使わないのはもはやC#を使う理由はありません。<sup id="fnref-dfdb976b"><a href="#fn-dfdb976b">\*3</a></sup> ぜひLINQを活用して効率的なコーディングライフを実現してください。
+
+---
+
+<span id="fn-8dd1227e"></span>[*1](#fnref-8dd1227e): 手続き型オブジェクト指向言語と認識してます。
+
+<span id="fn-1db4d9ca"></span>[*2](#fnref-1db4d9ca): 業務で2回程書く機会がありました。
+
+<span id="fn-dfdb976b"></span>[*3](#fnref-dfdb976b): この発言は個人の感情的な見解になります。

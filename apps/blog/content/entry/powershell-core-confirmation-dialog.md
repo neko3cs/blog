@@ -1,0 +1,29 @@
+---
+Title: PowerShell Core で確認ダイアログ
+Category:
+- 備忘録
+- PowerShell
+Date: 2020-07-26T01:34:51+09:00
+URL: https://blog.neko3cs.net/entry/powershell-core-confirmation-dialog
+---
+
+以下のコードで実装。
+
+```shellscript
+$title = "タイトル"
+$message = "メッセージ"
+$options = [System.Management.Automation.Host.ChoiceDescription[]](
+   (New-Object System.Management.Automation.Host.ChoiceDescription "&Yes", "実行する"),
+   (New-Object System.Management.Automation.Host.ChoiceDescription "&No", "実行しない")
+)
+$defaultChoice = 1
+$result = $Host.UI.PromptForChoice($title, $message, $options, $defaultChoice)
+if ($result -ne 0) { exit }
+```
+
+ちなみに、Command Prompt の pause コマンドは以下で再現出来ます。
+
+```shellscript
+Write-Host "続行するには何かキーを押してください...`n"
+$host.UI.RawUI.ReadKey() | Out-Null
+```
