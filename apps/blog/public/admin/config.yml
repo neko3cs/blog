@@ -27,8 +27,7 @@ media_folder: apps/blog/public/images/uploads
 public_folder: /images/uploads
 
 # 記事のファイルのパスが、記事の URL のパスになる（content/entry/foo.md → /entry/foo）。
-# URL が /entry/<スラッグ> の記事と、はてなブログ時代の /entry/2020/03/30/002449 形式の記事で、コレクションを分ける。
-# 後者は URL を自動で作り直すと壊れるため、新規作成を止め、URL を変えられないようにしている。
+# はてなブログ時代の日付形式の URL（/entry/2020/03/30/002449）は、スラッグ形式に移し、public/_redirects で転送している。
 collections:
   - name: entry
     label: 記事
@@ -110,47 +109,3 @@ collections:
             label: カテゴリ
             widget: list
             default: []
-
-  - name: entry-hatena
-    label: はてなブログ時代の記事
-    label_singular: 記事
-    folder: apps/blog/content/entry
-    extension: md
-    format: yaml-frontmatter
-    nested:
-      depth: 4
-    identifier_field: Title
-    summary: '{{Title}}'
-    filter:
-      field: URL
-      pattern: '^https://blog\.neko3cs\.net/entry/\d{4}/'
-    create: false
-    delete: false
-    sortable_fields:
-      fields: [Date, Title]
-      default:
-        field: Date
-        direction: descending
-    fields:
-      - { name: Title, label: タイトル, widget: string }
-      - name: Category
-        label: カテゴリ
-        widget: relation
-        collection: categories
-        file: categories
-        value_field: 'items.*'
-        search_fields: ['items.*']
-        multiple: true
-        required: false
-      - name: Date
-        label: 公開日時
-        widget: datetime
-        format: 'YYYY-MM-DDTHH:mm:ssZ'
-      - name: URL
-        label: URL
-        widget: string
-        hint: ファイルの場所と対応しているため、変更しないでください
-      - name: body
-        label: 本文
-        widget: markdown
-        modes: [raw, rich_text]

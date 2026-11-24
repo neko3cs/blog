@@ -65,12 +65,13 @@ gh secret set CLOUDFLARE_ACCOUNT_ID
 
 ## 記事の置き場所
 
-記事は `apps/blog/content/entry/` に、はてなブログの URL パスと同じパスで置きます。
+記事は `apps/blog/content/entry/` に、記事の URL パスと同じパスで置きます。
 
-| はてなブログの URL | ファイル |
+| 記事の URL | ファイル |
 | --- | --- |
-| `/entry/2020/03/30/002449` | `apps/blog/content/entry/2020/03/30/002449.md` |
 | `/entry/how-to-disconnect-sql-server-db-connection` | `apps/blog/content/entry/how-to-disconnect-sql-server-db-connection.md` |
+
+はてなブログ時代の日付形式の URL（`/entry/2020/03/30/002449`）は、スラッグ形式（`/entry/zip-compress-tool-with-password-dotnet-tool`）に移しました。旧 URL は `apps/blog/public/_redirects` で、新しい URL へ 301 で転送します。このファイルは消さないでください（検索エンジンの評価と、外部からのリンクが切れます）。
 
 `apps/blog/src/content/` には置かないでください。Analog が Markdown を自動でルートとして登録し、記事ページより優先されてしまいます。
 
@@ -123,7 +124,6 @@ frontmatter とファイルの場所の間違いは、`pnpm check:frontmatter` �
 - **ログインできるのは、`neko3cs` だけ。** 受け口の Worker（`apps/cms-auth`）が、ログインしたユーザー名を確かめ、`neko3cs` 以外にはトークンを渡しません。トークンの権限は `public_repo` に固定しています。
 - **新しい記事。** タイトル、URL、本文を入れます。URL は、初めから入っている `https://blog.neko3cs.net/entry/` の後ろに、記事の名前（スラッグ。英小文字・数字・ハイフンで、ドットも使えます）を足します。スラッグがそのままファイル名（`apps/blog/content/entry/<スラッグ>.md`）になるため、保存したあとは変えないでください。「下書き」は、初めはオンです。公開するときにオフにして保存します。
 - **本文は、Markdown のまま編集します。** リッチテキストに切り替えると、`<iframe>` の埋め込みやリンクカードなどが書き換わることがあります。
-- **一覧は2つに分かれます。** 「記事」は URL が `/entry/<スラッグ>` の記事です。「はてなブログ時代の記事」は `/entry/2020/03/30/002449` 形式の記事で、新規作成と URL の変更はできません（URL を作り直すと、ファイルの場所と合わなくなるため）。
 - **画像。** `apps/blog/public/images/uploads/` に保存され、本文からは `/images/uploads/<ファイル名>` で参照します。
 - **自動保存はありません。** 保存せずにタブを閉じると、書きかけは消えます。
 

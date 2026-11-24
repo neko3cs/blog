@@ -1,0 +1,63 @@
+---
+Title: パスワード付き zip 圧縮ツールを nuget に公開しました
+Category:
+- .NET Core
+- .NET Core Tools
+- CLI
+Date: 2020-06-04T00:41:59+09:00
+URL: https://blog.neko3cs.net/entry/password-zip-tool-published-to-nuget
+---
+
+以前こんな記事を書きました。
+
+[dotnet core tool でパスワード付き ZIP 圧縮ツール作ってみた - ねこさんのぶろぐ](/entry/zip-compress-tool-with-password-dotnet-tool)
+
+このツール、理想としていた `zip` コマンドと少しインターフェースが違いました。
+
+また、上記記事執筆時は画像の通り動いていたのですが、不具合が発生し動かなくなってしまいました。
+
+このため、改修をおこない、ついでにすぐインストール出来るよう nuget.org に公開しました。
+
+[DnZip 3.0.0](https://www.nuget.org/packages/DnZip)
+
+## 発生した不具合について
+
+圧縮しても解凍出来ないファイルが出来上がるようになってしまいました。
+
+記事執筆時では [SharpZipLib](https://github.com/icsharpcode/SharpZipLib) という zip ライブラリを用いていました。
+
+ですが調べた結果、SharpZipLib では macOS 上で上手く動かないので [DotNetZip](https://github.com/haf/DotNetZip.Semverd) というライブラリを使うと良いことが以下記事から分かりました。
+
+[ZIP file created with SharpZipLib cannot be opened on Mac OS X](https://stackoverflow.com/questions/1679986/zip-file-created-with-sharpziplib-cannot-be-opened-on-mac-os-x)
+
+なので、zip 圧縮処理を DotNetZip へ移行しました。
+
+詳細なコードは以下にありますのでご興味ある方はご覧ください。
+
+[GitHub - neko3cs/dnzip: Zip tool made with dotnet.](https://github.com/neko3cs/dnzip)
+
+## 使い方
+
+シンタックスは以下の通りです。
+
+```text
+$ dnzip [options] <archiveFilePath> <sourceDirectoryPath>
+```
+
+現状、複数ファイル指定が出来ず、`<sourceDirectoryPath>` で指定したディレクトリ内のファイルを zip 圧縮するものとなっております。
+
+オプションは以下の通りです。
+
+| オプション | 機能 |
+| --- | --- |
+| `-r`, `--recursePaths` | 再起的に圧縮する。（指定しないとルートディレクトリのファイルのみ圧縮される） |
+| `-e`, `--encrypt` | 暗号化する。 |
+
+## 追加予定機能
+
+今のところ以下機能の追加を予定してます。
+
+- 複数のファイル、ディレクトリを指定出来る
+- 本家 `zip` コマンドの `--no-dir-entries` の機能
+
+余裕が出来たら実装していきたいと思います。

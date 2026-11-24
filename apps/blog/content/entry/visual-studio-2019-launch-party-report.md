@@ -1,0 +1,59 @@
+---
+Title: 『【Launch 記念】Visual Studio 2019 を試してみる会』に参加しました
+Category:
+- Visual Studio
+- イベント参加
+Date: 2019-04-11T00:51:50+09:00
+URL: https://blog.neko3cs.net/entry/visual-studio-2019-launch-party-report
+---
+
+「【Launch 記念】Visual Studio 2019 を試してみる会」に参加しました。
+
+[【Launch 記念】Visual Studio 2019 を試してみる会 (2019/04/10 19:00〜)](https://csugjp.connpass.com/event/122874/)
+
+## やったこと
+
+- LTの聴講
+- Visual Studio for Mac 2019での新機能の確認
+
+## LTの聴講
+
+### たなか([@tanaka\_733](https://mobile.twitter.com/tanaka_733)) さんのVS 2019でGit操作が便利になったって話。
+
+<div class="embed"><iframe src="https://www.slideshare.net/slideshow/embed_code/key/1vLpvlxlyRd94k" width="427" height="356" style="aspect-ratio: 427 / 356" loading="lazy" allowfullscreen></iframe></div>
+
+<strong>[Try! Visual Studio 209 git feature](https://www.slideshare.net/tanakata/try-visual-studio-209-git-feature-140321899 "Try! Visual Studio 209 git feature")</strong> from <strong>[Takayoshi Tanaka](https://www.slideshare.net/tanakata)</strong>
+
+Visual StudioでGitを覚えた私からするとVSでGitがより使いやすくなるのは素晴らしいと感じました。
+
+### Tomohiro Suzuki([@hiro128\_777](https://mobile.twitter.com/hiro128_777))さんのVS for Mac 2019つかおう！って話
+
+<div class="embed"><iframe src="https://www.slideshare.net/slideshow/embed_code/key/hf0sr648EM96TR" width="427" height="356" style="aspect-ratio: 427 / 356" loading="lazy" allowfullscreen></iframe></div>
+
+<strong>[Visual Studio といえば 当然 Visual Studio for Mac だよね！](https://www.slideshare.net/TomohiroSuzuki4/visual-studio-for-mac "Visual Studio といえば 当然 Visual Studio for Mac だよね！")</strong> from <strong>[Tomohiro Suzuki](https://www.slideshare.net/TomohiroSuzuki4)</strong>
+
+私自身、MacユーザなのでVS for Macの方が圧倒的に使います。 みなさんVS for Macを使いましょう！！（便乗）
+
+### mishizaki([@mishi\_cs](https://mobile.twitter.com/mishi_cs))さんのIntelliCodeの話
+
+<div class="embed"><iframe src="https://www.slideshare.net/slideshow/embed_code/key/MPXkfN2YARrjHe" width="427" height="356" style="aspect-ratio: 427 / 356" loading="lazy" allowfullscreen></iframe></div>
+
+<strong>[コードに基づくモデルによる IntelliCode](https://www.slideshare.net/mishizaki1/intellicode "コードに基づくモデルによる IntelliCode")</strong> from <strong>[m ishizaki](https://www.slideshare.net/mishizaki1)</strong>
+
+学習モデルをMSが抱え込んでしまう、メールじゃないと削除して貰えず、 本当に削除されているのか？？？ってお話は重要でしたね。
+
+## Visual Studio for Mac 2019での新機能の確認
+
+以下の2つのサイトを読んで2017と2019の差分を確認しました。
+
+[Visual Studio 2019 for Mac – リリース ノート](https://docs.microsoft.com/ja-jp/visualstudio/releasenotes/vs2019-mac-relnotes#rtw)
+
+[Visual Studio 2019 for Mac is now available | The Visual Studio Blog](https://devblogs.microsoft.com/visualstudio/visual-studio-2019-for-mac-is-now-available/)
+
+たくさんの確認は出来ませんでしたが、私はエディタが一新されて絵文字が使えるようになったという点に着目して、 JSからコールする『『『寿司を取得するAPI』』』を作成しました。
+
+> 寿司を取得するAPI作りました！ [pic.twitter.com/ntwl8mtH0C](https://t.co/ntwl8mtH0C)
+> 
+> — ねこ (@neko3cs) [2019年4月10日](https://twitter.com/neko3cs/status/1115953437726740481?ref_src=twsrc%5Etfw)
+
+今回の実習でAngularに慣れすぎて生JSやjQueryを忘れてしまっていることに気づいたので、 おいおい学び直しておきたいと思います...。（生JSはバイナリというにはまだ早い？）

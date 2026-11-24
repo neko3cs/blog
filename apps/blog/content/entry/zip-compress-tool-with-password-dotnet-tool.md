@@ -1,0 +1,195 @@
+---
+Title: dotnet core tool でパスワード付き ZIP 圧縮ツール作ってみた
+Category:
+- .NET Core
+- .NET Core Tools
+- CLI
+- C#
+Date: 2020-03-30T00:24:49+09:00
+URL: https://blog.neko3cs.net/entry/zip-compress-tool-with-password-dotnet-tool
+---
+
+最近巷では **dotnet core tool** というものが流行っている？のを知りました。
+
+[.NET ツール - .NET CLI](https://docs.microsoft.com/ja-jp/dotnet/core/tools/global-tools?WT.mc_id=DT-MVP-5002209)
+
+一言でいうと、 **npm global tool** です。
+
+Console App で作ったツールを NuGet に公開したりして使えます。
+
+私は以前こんな記事を書きました。
+
+[PowerShell Binary Module を作ってみた - ねこさんのぶろぐ](/entry/powershell-binary-module)
+
+ですが、PowerShell Binary Module は実装がちょっぴり独自的だったり、一々 PowerShell Profile に読み込みを記載したりといろいろ面倒でした。
+
+なので、 dotnet core tool の方が開発の仕方に馴染みがあって楽だと思いました。
+
+なので、ツールを作りました。
+
+## 作ったもの
+
+作ったものは GitHub に公開してあります。
+
+[GitHub - neko3cs/dnzip: Zip tool made with dotnet.](https://github.com/neko3cs/dn-zip)
+
+Windows では標準で暗号化 ZIP 圧縮する機能がないみたいです。
+
+普通の人は [7zip](https://sevenzip.osdn.jp/) のようなツールを入れると思います。
+
+私は元々 UNIX で育ったので純粋に `zip` コマンドが欲しくなりました。
+
+なので、今回は `zip` コマンドを模倣して作りました。
+
+以下が主要なコードです。
+
+```csharp
+using System;
+using System.IO;
+using System.Text;
+using Cocona;
+using ICSharpCode.SharpZipLib.Zip;
+
+namespace DnZip
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            CoconaLiteApp.Run<Program>(args);
+        }
+
+        [PrimaryCommand]
+        public int CompressZipFile(
+            [Argument]string path,
+            [Option('r')]bool recursePaths,
+            [Option('e')]bool encrypt
+        )
+        {
+            if (string.IsNullOrEmpty(path)) return 1;
+            var targetDirectory = new DirectoryInfo(path);
+            if (!targetDirectory.Exists)
+            {
+                Console.WriteLine("Error: Path not found.");
+                return 1;
+            }
+
+            var zip = new FastZip();
+            if (encrypt)
+            {
+                var password = GetPasswordFromConsole();
+                if (string.IsNullOrEmpty(password))
+                {
+                    Console.WriteLine("Error: Password verification failed.");
+                    return 1;
+                }
+                zip.Password = password;
+            }
+            zip.CreateZip(
+                zipFileName: Path.Combine(targetDirectory.Parent.FullName, $"{targetDirectory.Name}.zip"),
+                targetDirectory.FullName,
+                recurse: recursePaths,
+                fileFilter: null,
+                directoryFilter: null
+            );
+
+            return 0;
+        }
+        
+        // ...(省略)
+    }
+}
+```
+
+特に複雑なことはしていません。
+
+[Cocona.Lite](https://github.com/mayuki/Cocona) で引数・オプションの受け取りを楽にし、[SharpZipLib](https://github.com/icsharpcode/SharpZipLib) で ZIP 圧縮処理をしています。
+
+実は重要なのはこちらです。
+
+```xml
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>dnzip</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cocona.Lite" Version="1.3.0" />
+    <PackageReference Include="SharpZipLib" Version="1.2.0" />
+  </ItemGroup>
+
+</Project>
+```
+
+dotnet core tool にする方法はとても簡単です。
+
+<strong>プロジェクトファイルの `PropertyGroup` に以下の3行を付け加えるだけです。</strong>
+
+```xml
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>{パッケージ名}</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+```
+
+あとは難しいことを考えず、ただ以下のコマンドを打つだけです。
+
+```shellscript
+$ dotnet pack;
+```
+
+これでプロジェクトファイルに指定した `./nupkg` のフォルダに `*.nupkg` というファイルが生成されていると思います。
+
+## 作ったツールを使ってみる
+
+作ったツールをインストールする方法で一番簡単な方法は、ローカルにある `.nupkg` からインストールだと思います。
+
+今回はこの方法でやってみました。
+
+以下のコマンドを実行すると出来ます。
+
+```shellscript
+$ dotnet tool install {パッケージ名} -g --add-source {.nupkg ファイルの場所}
+```
+
+インストールされると緑色の文字で結果を示してくれます。
+
+![](/images/20200329/20200329235945.png)
+
+では実際に zip 圧縮してみます。
+
+![](/images/20200330/20200330000052.png)
+
+UNIX の `zip` コマンドのように、`-er` オプションでパスワード付き、再帰的の設定をし、パスワード入力も文字が表示されていません。
+
+やりました💪
+
+## 余談：ツールのアンインストール
+
+ツールのアンインストールも簡単です。
+
+以下のコマンドを実行するだけです。
+
+```shellscript
+$ dotnet tool uninstall {パッケージ名} -g
+```
+
+![](/images/20200330/20200330000400.png)
+
+## まとめ
+
+.NET Core Console App をグローバルツールにする、 dotnet core tool を試してみました。
+
+以前、PowerShell Binary Module を作った際に「何度もよく使うツールの場合はターミナルが開かれていればすぐに使えるので便利」と言いました。
+
+ですが、 dotnet core tool を使えば、 Binary Module で実現したいことが実践出来ます。
+
+Binary Module ですと `Cmdlet` を継承する都合上、その癖を理解する必要があります。
+
+Console App なら C# を使える人なら初心で誰しも通っている、言わば多くの人が実装できる手法なため、こちらのほうが有用性が高いと感じました。
+
+dotnet core tool はどんどん作って、PowerShell Script と組み合わせ、UNIX 思想の考えを Windows でも実践していけたらいいと思いました。

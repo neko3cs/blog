@@ -9,7 +9,7 @@ Date: 2024-07-04T17:31:19+09:00
 URL: https://blog.neko3cs.net/entry/join-report-of-codeer-lowcode-blazor
 ---
 
-久しぶりにオフラインのセミナーに参加しました。 Microsoftへ訪問するのは [2019 年のイベント](/entry/2019/09/26/182540) 以来ですね。
+久しぶりにオフラインのセミナーに参加しました。 Microsoftへ訪問するのは [2019 年のイベント](/entry/dotnet-core-3-seminar-report) 以来ですね。
 
 [https://codeer.connpass.com/event/319762/](https://codeer.connpass.com/event/319762/)
 

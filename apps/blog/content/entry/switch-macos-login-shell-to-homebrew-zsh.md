@@ -1,0 +1,50 @@
+---
+Title: macOSのログインシェルをHomebrewで取得したzshに切り替える
+Category:
+- zsh
+- macOS
+- CLI
+Date: 2020-01-13T22:06:53+09:00
+URL: https://blog.neko3cs.net/entry/switch-macos-login-shell-to-homebrew-zsh
+---
+
+今更ですがmacOSがCatalinaになってからターミナルでのデフォルトログインシェルがzshになりました。 bashに比べてzshの方が高機能であるそうなのでzshを使うことにしました。
+
+ですが、macOSデフォルトのzshより[Homebrew](https://brew.sh/index_ja)から取得したzshの方がバージョンが最新らしいです。 なのでHomebrewからzshを取得して設定します。
+
+## 設定の仕方
+
+Homebrewは公式HPを参考にインストールします。
+
+インストールが終わったら、以下のコマンドでzshをインストールします。
+
+```shellscript
+$ brew install zsh
+```
+
+インストール後 `/etc/shells` ファイルにインストールしたzshのパスを追加します。 これをしないとターミナルを閉じる度にzshのプロセスを終了しますか？というダイアログが出てしまいます。
+
+```text
+# List of acceptable shells for chpass(1).
+# Ftpd will not allow users to connect who are not using
+# one of these shells.
+
+/bin/bash
+/bin/csh
+/bin/dash
+/bin/ksh
+/bin/sh
+/bin/tcsh
+/bin/zsh
+/usr/local/bin/zsh # <- これを追加する
+```
+
+最後に、Homebrewからインストールした方のzshがターミナルのデフォルトシェルになる様に設定してあげます。
+
+```text
+$ chpass -s /usr/local/bin/zsh
+```
+
+## 参考
+
+- [Homebrew で作るモダンなフロントエンド開発環境 (Git + zsh + apache + MySQL + Ruby)](https://dev.classmethod.jp/etc/modern-dev-environment-by-homebrew/)
