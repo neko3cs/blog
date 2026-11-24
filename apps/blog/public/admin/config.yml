@@ -43,7 +43,8 @@ collections:
       template: '{{fields.URL | entry_slug}}'
       editable: false
     identifier_field: Title
-    summary: '{{Title}}'
+    # 下書き中の記事には、一覧で 📝 を付ける
+    summary: "{{Draft | ternary('📝 ', '')}}{{Title}}"
     filter:
       field: URL
       pattern: '^https://blog\.neko3cs\.net/entry/[^/]+$'
@@ -66,7 +67,16 @@ collections:
         default: true
         required: false
         hint: オンのあいだは公開されません。公開するときはオフにして保存します
-      - { name: Category, label: カテゴリ, widget: list, required: false }
+      - name: Category
+        label: カテゴリ
+        widget: relation
+        collection: categories
+        file: categories
+        value_field: 'items.*'
+        search_fields: ['items.*']
+        multiple: true
+        required: false
+        hint: 一覧にないカテゴリは、先に左のメニューの「カテゴリ」に追加してください
       - name: Date
         label: 公開日時
         widget: datetime
@@ -86,6 +96,20 @@ collections:
         # 記事は <iframe> の埋め込みやリンクカードなど、Markdown の拡張を使っている。
         # リッチテキストでは書き換わることがあるので、既定は Markdown のまま編集する
         modes: [raw, rich_text]
+
+  # カテゴリの一覧。記事の Category はここから選ぶ（新しいカテゴリは、ここに足す）
+  - name: categories
+    label: カテゴリ
+    files:
+      - name: categories
+        label: カテゴリの一覧
+        file: apps/blog/content/categories.yml
+        format: yaml
+        fields:
+          - name: items
+            label: カテゴリ
+            widget: list
+            default: []
 
   - name: entry-hatena
     label: はてなブログ時代の記事
@@ -109,7 +133,15 @@ collections:
         direction: descending
     fields:
       - { name: Title, label: タイトル, widget: string }
-      - { name: Category, label: カテゴリ, widget: list, required: false }
+      - name: Category
+        label: カテゴリ
+        widget: relation
+        collection: categories
+        file: categories
+        value_field: 'items.*'
+        search_fields: ['items.*']
+        multiple: true
+        required: false
       - name: Date
         label: 公開日時
         widget: datetime
