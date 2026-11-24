@@ -13,6 +13,8 @@ Terraform などの IaC は使っていません。今の規模では、管理�
 | 管理画面の設定（`apps/blog/public/admin/`） | Git | 同上 |
 | 動いている Worker のバージョン | Cloudflare | バージョン履歴から戻せる（2.2） |
 | DNS のレコード | Cloudflare（書き出しは `docs/recovery/`。**未了**、下記の注意を参照） | 作り直す（3.2） |
+| ゾーンの設定（Always Use HTTPS、ルート・`www` から `portfolio` へのリダイレクトのルール） | Cloudflare（書き出しなし） | 画面で作り直す（3.2.1） |
+| ドメインの登録先（レジストラ）とそのログイン | レジストラ | 作り直せない。ネームサーバーを Cloudflare に向ける操作ができなくなるので、登録先とログインを控えておく（下記） |
 | Cloudflare の API トークン | Cloudflare | 作り直す（3.3） |
 | `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID` | GitHub の Secrets | 値は読み出せない。作り直して登録し直す（3.4） |
 | `GITHUB_CLIENT_ID`、`GITHUB_CLIENT_SECRET` | 受け口 Worker のシークレット | 値は読み出せない。OAuth App から取り直して登録し直す（3.5） |
@@ -25,6 +27,8 @@ Terraform などの IaC は使っていません。今の規模では、管理�
 
 読み出せない値は、パスワードマネージャーに入れておきます。値そのものは、リポジトリに置きません。
 
+- ドメイン `neko3cs.net` の登録先（レジストラ）と、そのログイン情報
+- Cloudflare と GitHub のアカウントの、2段階認証のバックアップコード
 - Cloudflare のアカウント ID（秘密ではないが、控えておく）
 - Cloudflare の API トークン（作ったときに1度だけ表示される）
 - GitHub の OAuth App の Client ID と Client secret
@@ -99,9 +103,31 @@ Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records で、
 | TXT | `neko3cs.net` | `google-site-verification=OxRcB5XmaSQ8_UyO6AA3Ngv_od8ARPTGaKrbaLNUPmk` | Search Console の「ドメイン」プロパティの所有権確認 |
 | TXT | `neko3cs.net` | `openai-domain-verification=dv-IMMDPC9OWgFSTzs9HQyYQ6FK` | OpenAI のドメイン確認 |
 
-このほかに、ポートフォリオサイトなどのレコードもあります。この表は、問い合わせで分かった範囲だけです。レコードの一覧は、Cloudflare の画面か API でないと分からないので、書き出しができたら、そちらを正にします。Search Console の TXT は、「ドメイン」プロパティの所有権の確認で、新しい値が表示されることもあります。
+**ブログ以外にも、名前が引けるレコードがあります。** 公開されている応答から確認できた動作は、次のとおりです（2026-11-24 時点）。作り直すときに抜けると、ポートフォリオサイトが見えなくなります。レコードの種類と向き先は、問い合わせでは分からないので、Cloudflare の画面で確かめて、書き足してください。
+
+| 名前 | 確認できた動作 | 作り直すときに必要なもの |
+| --- | --- | --- |
+| `neko3cs.net`（ルート） | Cloudflare の IP が返り、`https://portfolio.neko3cs.net/` へ 301（パスとクエリは引き継ぐ） | プロキシ オンのレコードと、リダイレクトのルール（3.2.1） |
+| `www.neko3cs.net` | ルートと同じ。`https://portfolio.neko3cs.net/` へ 301 | 同上 |
+| `portfolio.neko3cs.net` | Cloudflare の IP が返り、200 でサイトが表示される | ポートフォリオサイト（別のリポジトリ `neko3cs/portfolio-site`、Cloudflare Pages）のカスタムドメイン。そちらの手順で作る |
+
+この表と TXT の表は、問い合わせで分かった範囲だけです。名前を知らないレコードは分かりません。レコードの一覧は、Cloudflare の画面か API でないと分からないので、書き出しができたら、そちらを正にします。Search Console の TXT は、「ドメイン」プロパティの所有権の確認で、新しい値が表示されることもあります。
+
+#### 3.2.1 DNS 以外の、ゾーンの設定
+
+次の設定は、Git にも、DNS のエクスポートにもありません。Cloudflare の画面（`neko3cs.net` → SSL/TLS、Rules）で、設定を作り直します。
+
+| 設定 | 確認できた動作 | 備考 |
+| --- | --- | --- |
+| Always Use HTTPS | `http://blog.neko3cs.net/` が `https://blog.neko3cs.net/` へ 301 になる | SSL/TLS → Edge Certificates。オン |
+| リダイレクトのルール | `neko3cs.net` と `www.neko3cs.net` のすべてのパスを、パスとクエリを保ったまま `https://portfolio.neko3cs.net/` へ 301 | Rules → Redirect Rules。ルールの式と、ステータスコードは、画面で確認して書き足す |
+| SSL/TLS の暗号化モード、最小の TLS バージョンなど | 未確認 | 画面を見て、既定から変えていれば、ここに書く |
+
+> **確認が必要:** この表の「未確認」の行と、リダイレクトのルールの式は、画面で確かめて埋めてください。
 
 > `blog` のレコードのプロキシがオフだと、Worker のルートが効きません。作り直したあとは、オレンジの雲（プロキシ オン）になっているかを確かめます。
+
+> はてなブログを非公開にした（#10）あとで作り直すときは、`hatenablog.com` を向いた CNAME を作る意味がありません。乗っ取られる心配の種にもなります（#14）。#14 のあとの構成が決まったら、この行を書き換えます。
 
 ### 3.3 Cloudflare の API トークン
 
@@ -136,7 +162,7 @@ gh secret set CLOUDFLARE_ACCOUNT_ID
 
    Redirect URI（callback URL）は、受け口の Worker の URL に `/callback` を足したものです。ここが違うと、ログインで `redirect_uri` のエラーになります。
 2. 作ったら、Client ID を控え、「Generate a new client secret」で Client secret を作って控える。パスワードマネージャーに入れる。
-3. **Worker を先にデプロイする。** シークレットは、Worker があるところに登録します。GitHub の Actions → Deploy → Run workflow で、`main` からデプロイする（3.4 までが済んでいること）。
+3. **Worker を先にデプロイする。** シークレットは、Worker があるところに登録します。GitHub の Actions → Deploy → Run workflow で、`main` からデプロイする（3.4 までが済んでいること）。別のアカウントで作り直すときは、先にダッシュボードの Workers & Pages で、`workers.dev` のサブドメインを登録しておく。登録がないと、対話のできない Actions のデプロイは、`workers_dev: true` のところで失敗する見込み（未確認）。
 4. 受け口の Worker にシークレットを登録する（コマンドの実行中に、値を入力する）。
 
    ```bash
