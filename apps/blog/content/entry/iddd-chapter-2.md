@@ -1,8 +1,6 @@
 ---
 Title: IDDD 本 2 章を読んだのでアウトプットする
 Draft: true
-Category:
-  - DDD
 Date: 2026-11-22T09:51:03+09:00
 URL: https://blog.neko3cs.net/entry/iddd-chapter-2
 ---
@@ -16,3 +14,5 @@ IDDD 本こと「[実践ドメイン駆動設計](https://www.amazon.co.jp/dp/B0
 2 章のテーマは「ドメイン、サブドメイン、境界づけられたコンテキスト」になります。
 
 # サブタイトル
+
+メモメモ
