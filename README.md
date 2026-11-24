@@ -63,6 +63,10 @@ gh secret set CLOUDFLARE_ACCOUNT_ID
 
 手元から直接デプロイするときは、`pnpm build && pnpm --filter blog exec wrangler deploy` を実行します。
 
+## 失ったときの作り直し（復旧）
+
+IaC は使っていません。Cloudflare や GitHub の設定（DNS、API トークン、Secrets、OAuth App、`main` のルールセット）を失ったときの、戻し方と作り直す手順は [docs/recovery.md](docs/recovery.md) にまとめています。Secrets の値は読み出せないので、パスワードマネージャーに入れておきます。
+
 ## 記事の置き場所
 
 記事は `apps/blog/content/entry/` に、記事の URL パスと同じパスで置きます。
@@ -129,7 +133,7 @@ frontmatter とファイルの場所の間違いは、`pnpm check:frontmatter` �
 
 ### 初めて使うときの準備
 
-一度だけ、次の3つを行います。
+一度だけ、次の3つを行います。失ったあとの作り直しも、同じ手順です（[docs/recovery.md](docs/recovery.md)）。
 
 1. **GitHub の OAuth App を作ります。** GitHub の Settings → Developer settings → OAuth Apps → New OAuth App で、次のように入れます。
    - Homepage URL: `https://blog.neko3cs.net`
