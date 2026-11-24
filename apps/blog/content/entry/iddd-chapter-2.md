@@ -1,6 +1,8 @@
 ---
 Title: IDDD 本 2 章を読んだのでアウトプットする
 Draft: true
+Category:
+  - ドメイン駆動設計
 Date: 2026-11-22T09:51:03+09:00
 URL: https://blog.neko3cs.net/entry/iddd-chapter-2
 ---
