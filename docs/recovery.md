@@ -2,7 +2,9 @@
 
 Cloudflare や GitHub の設定を失ったとき（誤って消した、アカウントの問題、別のアカウントで作り直すなど）に、この手順書を見て元の環境を作り直すためのものです（Issue #24）。
 
-Terraform などの IaC は使っていません。今の規模では、管理の手間のほうが大きいためです。代わりに、この手順書と、設定の書き出し（`docs/recovery/`）で補います。リソースが増える、複数のサイトで同じ構成を作る、他の人と共同で変更する、といった状況になったら、IaC を再検討します。
+Terraform などの IaC は使っていません。今の規模では、管理の手間のほうが大きいためです。代わりに、この手順書と、設定の書き出し（`docs/recovery/`）で補います。リソースが増える、複数のサイトで同じ構成を作る、他の人と共同で変更する、といった状況になったら、IaC を再検討します。Cloudflare のゾーンと `main` のルールセットを IaC にする計画は、#30 にあります（#14 の後）。
+
+調査から復旧まで、Claude などのエージェントに任せることを想定しています。そのため、画面の操作に頼らず、API とコマンドで再現できるように、設定は機械で読める形（JSON、BIND 形式）で書き出して置きます（6）。値を入力する操作（シークレット、2段階認証、ログイン）は、人が行います。
 
 ## 1. 何が Git にあり、何がないか
 
@@ -13,7 +15,7 @@ Terraform などの IaC は使っていません。今の規模では、管理�
 | 管理画面の設定（`apps/blog/public/admin/`） | Git | 同上 |
 | 動いている Worker のバージョン | Cloudflare | バージョン履歴から戻せる（2.2） |
 | DNS のレコード | Cloudflare（書き出しは `docs/recovery/`。**未了**、下記の注意を参照） | 作り直す（3.2） |
-| ゾーンの設定（Always Use HTTPS、ルート・`www` から `portfolio` へのリダイレクトのルール） | Cloudflare（書き出しなし） | 画面で作り直す（3.2.1） |
+| ゾーンの設定（Always Use HTTPS、ルート・`www` から `portfolio` へのリダイレクトのルール） | Cloudflare（書き出しは `docs/recovery/zone-settings.json`、`docs/recovery/redirect-rules.json`） | API で戻す（3.2.1） |
 | ドメインの登録先（レジストラ）とそのログイン | レジストラ | 作り直せない。ネームサーバーを Cloudflare に向ける操作ができなくなるので、登録先とログインを控えておく（下記） |
 | Cloudflare の API トークン | Cloudflare | 作り直す（3.3） |
 | `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID` | GitHub の Secrets | 値は読み出せない。作り直して登録し直す（3.4） |
@@ -89,41 +91,53 @@ Cloudflare と GitHub の設定をすべて失った場合の手順です。作�
 
 Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records で、書き出しがあれば、Import で取り込みます。書き出しは、同じ画面の Export（BIND 形式）で作ります（作り方は 5）。
 
-書き出しがまだないあいだは、次の表を正として、手で作ります。
+書き出しがまだないあいだは、次の表を正として、手で作ります。この表は、2026-11-24 に API で書き出した DNS のレコードに基づきます。
 
 | 種類 | 名前 | 向き先 | プロキシ | 備考 |
 | --- | --- | --- | --- | --- |
 | CNAME | `blog` | `hatenablog.com` | オン | #14 が終わるまでの状態。プロキシをオンにしたこのレコードに、Worker のルート `blog.neko3cs.net/*` が掛かる |
+| CNAME | `neko3cs.net`（ルート） | `portfolio-site-4m3.pages.dev` | オン | ルートは CNAME フラットニングで解決される。リダイレクトのルール（3.2.1）が先に掛かって、`portfolio` へ 301 になる |
+| CNAME | `www` | `portfolio-site-4m3.pages.dev` | オン | 同上 |
 
-`nslookup -type=TXT neko3cs.net` で確認できた、ルート（`neko3cs.net`）の TXT レコードは次の3つです（2026-11-24 時点。公開されている値です）。
+TXT レコードは次の5つです（2026-11-24 に API で確認。公開されている値です）。
 
 | 種類 | 名前 | 内容 | 用途 |
 | --- | --- | --- | --- |
 | TXT | `neko3cs.net` | `v=spf1 -all` | このドメインからはメールを送らない（SPF） |
 | TXT | `neko3cs.net` | `google-site-verification=OxRcB5XmaSQ8_UyO6AA3Ngv_od8ARPTGaKrbaLNUPmk` | Search Console の「ドメイン」プロパティの所有権確認 |
 | TXT | `neko3cs.net` | `openai-domain-verification=dv-IMMDPC9OWgFSTzs9HQyYQ6FK` | OpenAI のドメイン確認 |
+| TXT | `_dmarc` | `v=DMARC1; p=reject;` | 認証に失敗したメールは拒否する（DMARC）。SPF とあわせて、このドメインではメールを使わない設定 |
+| TXT | `_github-pages-challenge-neko3cs` | `ba0dc234e173c73e82435553a04951` | GitHub Pages のドメイン確認（GitHub のアカウントに結び付く）。今も要るかは未確認 |
 
-**ブログ以外にも、名前が引けるレコードがあります。** 公開されている応答から確認できた動作は、次のとおりです（2026-11-24 時点）。作り直すときに抜けると、ポートフォリオサイトが見えなくなります。レコードの種類と向き先は、問い合わせでは分からないので、Cloudflare の画面で確かめて、書き足してください。
+**ブログ以外の名前の、確認できた動作と、作り直すときに必要なものは次のとおりです**（2026-11-24 時点）。抜けると、ポートフォリオサイトが見えなくなります。
 
 | 名前 | 確認できた動作 | 作り直すときに必要なもの |
 | --- | --- | --- |
-| `neko3cs.net`（ルート） | Cloudflare の IP が返り、`https://portfolio.neko3cs.net/` へ 301（パスとクエリは引き継ぐ） | プロキシ オンのレコードと、リダイレクトのルール（3.2.1） |
+| `neko3cs.net`（ルート） | Cloudflare の IP が返り、`https://portfolio.neko3cs.net/` へ 301（パスとクエリは引き継ぐ） | プロキシ オンの CNAME（上の表）と、リダイレクトのルール（3.2.1） |
 | `www.neko3cs.net` | ルートと同じ。`https://portfolio.neko3cs.net/` へ 301 | 同上 |
-| `portfolio.neko3cs.net` | Cloudflare の IP が返り、200 でサイトが表示される | ポートフォリオサイト（別のリポジトリ `neko3cs/portfolio-site`、Cloudflare Pages）のカスタムドメイン。そちらの手順で作る |
+| `portfolio.neko3cs.net` | Cloudflare の IP が返り、200 でサイトが表示される | ポートフォリオサイト（別のリポジトリ `neko3cs/portfolio-site`、Cloudflare Pages）のカスタムドメイン。そちらの手順で作る。**API の書き出しには、この名前のレコードがない。** Pages が管理していて、一覧に出ないと見られる（未確認）。作り直したあと、一覧に出ない場合は、Pages の画面で確かめる |
 
-この表と TXT の表は、問い合わせで分かった範囲だけです。名前を知らないレコードは分かりません。レコードの一覧は、Cloudflare の画面か API でないと分からないので、書き出しができたら、そちらを正にします。Search Console の TXT は、「ドメイン」プロパティの所有権の確認で、新しい値が表示されることもあります。
+これらの表は、2026-11-24 に API で書き出した一覧に基づきます。書き出しのファイル（`docs/recovery/dns-neko3cs.net.txt`）は、`blog` の CNAME の片付け（#14）が終わってから置き、置いたら、そちらを正にします。Search Console の TXT は、「ドメイン」プロパティの所有権の確認で、新しい値が表示されることもあります。
 
 #### 3.2.1 DNS 以外の、ゾーンの設定
 
-次の設定は、Git にも、DNS のエクスポートにもありません。Cloudflare の画面（`neko3cs.net` → SSL/TLS、Rules）で、設定を作り直します。
+次の設定は、Git にも、DNS のエクスポートにもありません。書き出し（`docs/recovery/`、2026-11-24）があるので、下の手順で API から戻せます。画面（`neko3cs.net` → SSL/TLS、Rules）で作り直してもかまいません。
 
-| 設定 | 確認できた動作 | 備考 |
+| 設定 | 値（書き出しで確認） | 備考 |
 | --- | --- | --- |
-| Always Use HTTPS | `http://blog.neko3cs.net/` が `https://blog.neko3cs.net/` へ 301 になる | SSL/TLS → Edge Certificates。オン |
-| リダイレクトのルール | `neko3cs.net` と `www.neko3cs.net` のすべてのパスを、パスとクエリを保ったまま `https://portfolio.neko3cs.net/` へ 301 | Rules → Redirect Rules。ルールの式と、ステータスコードは、画面で確認して書き足す |
-| SSL/TLS の暗号化モード、最小の TLS バージョンなど | 未確認 | 画面を見て、既定から変えていれば、ここに書く |
+| Always Use HTTPS | オン（`always_use_https`） | SSL/TLS → Edge Certificates。`http://blog.neko3cs.net/` が `https://blog.neko3cs.net/` へ 301 になる |
+| SSL/TLS の暗号化モード | `full`（`ssl`。`strict` ではない） | |
+| 最小の TLS バージョン | `1.0`（`min_tls_version`） | 引き上げるかは、別に決める |
+| リダイレクトのルール | 3つ（有効 2、無効 1）。`redirect-rules.json` | Rules → Redirect Rules。有効: `neko3cs.net` と `www.neko3cs.net` の全パスを、パスを保って `https://portfolio.neko3cs.net/` へ 301。無効: `www` から `blog.neko3cs.net` へ（過去の名残と見られる。要らなければ消してよい。未確認） |
+| そのほか | `zone-settings.json` に全項目 | 既定との差は、書き出しだけでは分からない。`hotlink_protection` が `on`（既定は `off` と思われる。意図した設定か未確認） |
 
-> **確認が必要:** この表の「未確認」の行と、リダイレクトのルールの式は、画面で確かめて埋めてください。
+書き出しから戻すときは、API で行います（読み出しと同じ `<zone_id>` を使います）。リダイレクトのルールは、`redirect-rules.json` の `rules` を、次で置き換えます。ゾーンの設定は、`zone-settings.json` で既定と違う項目だけを、`PATCH /zones/<zone_id>/settings/<項目の id>` で戻します。どちらも書き込みなので、実行の前に、ユーザーの確認を取ります。
+
+```bash
+curl -sS -X PUT "https://api.cloudflare.com/client/v4/zones/<zone_id>/rulesets/phases/http_request_dynamic_redirect/entrypoint" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
+  --data @docs/recovery/redirect-rules.json
+```
 
 > `blog` のレコードのプロキシがオフだと、Worker のルートが効きません。作り直したあとは、オレンジの雲（プロキシ オン）になっているかを確かめます。
 
@@ -226,4 +240,31 @@ gh api repos/neko3cs/blog/rulesets --method POST --input docs/recovery/ruleset-m
 gh api repos/neko3cs/blog/rulesets/<id> --jq 'del(.id,.node_id,.created_at,.updated_at,.current_user_can_bypass,._links,.source,.source_type)' > docs/recovery/ruleset-main.json
 ```
 
-**DNS のレコード**（#14 のあとに置きます）: Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records → Export で、BIND 形式のファイルを書き出し、`docs/recovery/dns-neko3cs.net.txt` に置きます。
+**Cloudflare のゾーンの設定とルール**（DNS 以外。#14 を待たずに置けます）
+
+読み出し専用のトークンを、別に作ります。デプロイ用のトークン（3.3）には、読み出しの権限がありません。
+
+- 権限: `neko3cs.net` のゾーンだけに、Zone の Read（ゾーンの ID を引くのに要ります）、Zone Settings の Read、DNS の Read、リダイレクトのルールの Read を付けます。リダイレクトのルールの権限の名前は、画面で確かめます（未確認。ルールの読み出しが `403` になったら、足りない権限を足します）。
+- 作ったトークンは、パスワードマネージャーに入れます。リポジトリには置きません。
+
+リポジトリのルートで実行します。`CLOUDFLARE_API_TOKEN` に、上の読み出し専用のトークンを入れます。
+
+```bash
+ZONE_ID=$(curl -sS "https://api.cloudflare.com/client/v4/zones?name=neko3cs.net" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result[0].id')
+
+# ゾーンの設定（SSL/TLS の暗号化モード、最小の TLS バージョン、Always Use HTTPS など）
+curl -sS "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq '.result | sort_by(.id) | map({id, value})' > docs/recovery/zone-settings.json
+
+# リダイレクトのルール（ルート・www から portfolio へ）
+curl -sS "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/rulesets/phases/http_request_dynamic_redirect/entrypoint" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq '.result | {rules: [.rules[] | del(.id, .version, .last_updated, .ref)]}' > docs/recovery/redirect-rules.json
+```
+
+`zone-settings.json` は、全項目が入ります。既定から変えた項目を見分けにくいので、初めて置くときは、画面の SSL/TLS と見比べて、変えている項目を 3.2.1 の表に書きます。書き出しの中身に、シークレットは含まれません。コミットする前に、目で確かめます。
+
+**DNS のレコード**（#14 のあとに置きます）
+
+```bash
+curl -sS "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/export" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" > docs/recovery/dns-neko3cs.net.txt
+```
+
+画面で書き出すときは、Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records → Export で、BIND 形式のファイルを書き出し、同じ場所に置きます。

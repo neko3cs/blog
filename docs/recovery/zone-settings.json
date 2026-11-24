@@ -1,0 +1,242 @@
+[
+  {
+    "id": "0rtt",
+    "value": "on"
+  },
+  {
+    "id": "advanced_ddos",
+    "value": "on"
+  },
+  {
+    "id": "always_online",
+    "value": "off"
+  },
+  {
+    "id": "always_use_https",
+    "value": "on"
+  },
+  {
+    "id": "automatic_https_rewrites",
+    "value": "on"
+  },
+  {
+    "id": "brotli",
+    "value": "on"
+  },
+  {
+    "id": "browser_cache_ttl",
+    "value": 14400
+  },
+  {
+    "id": "browser_check",
+    "value": "on"
+  },
+  {
+    "id": "cache_level",
+    "value": "aggressive"
+  },
+  {
+    "id": "challenge_ttl",
+    "value": 1800
+  },
+  {
+    "id": "ciphers",
+    "value": []
+  },
+  {
+    "id": "cname_flattening",
+    "value": "flatten_at_root"
+  },
+  {
+    "id": "development_mode",
+    "value": "off"
+  },
+  {
+    "id": "early_hints",
+    "value": "on"
+  },
+  {
+    "id": "ech",
+    "value": "on"
+  },
+  {
+    "id": "edge_cache_ttl",
+    "value": 7200
+  },
+  {
+    "id": "email_obfuscation",
+    "value": "on"
+  },
+  {
+    "id": "filter_logs_to_cloudflare",
+    "value": "off"
+  },
+  {
+    "id": "hotlink_protection",
+    "value": "on"
+  },
+  {
+    "id": "http2",
+    "value": "on"
+  },
+  {
+    "id": "http3",
+    "value": "on"
+  },
+  {
+    "id": "ip_geolocation",
+    "value": "on"
+  },
+  {
+    "id": "ipv6",
+    "value": "on"
+  },
+  {
+    "id": "log_to_cloudflare",
+    "value": "on"
+  },
+  {
+    "id": "long_lived_grpc",
+    "value": "off"
+  },
+  {
+    "id": "max_upload",
+    "value": 100
+  },
+  {
+    "id": "min_tls_version",
+    "value": "1.0"
+  },
+  {
+    "id": "minify",
+    "value": {
+      "css": "off",
+      "html": "off",
+      "js": "off"
+    }
+  },
+  {
+    "id": "mirage",
+    "value": "off"
+  },
+  {
+    "id": "mobile_redirect",
+    "value": {
+      "status": "off",
+      "mobile_subdomain": null,
+      "strip_uri": false
+    }
+  },
+  {
+    "id": "opportunistic_encryption",
+    "value": "on"
+  },
+  {
+    "id": "opportunistic_onion",
+    "value": "on"
+  },
+  {
+    "id": "orange_to_orange",
+    "value": "off"
+  },
+  {
+    "id": "origin_error_page_pass_thru",
+    "value": "off"
+  },
+  {
+    "id": "polish",
+    "value": "off"
+  },
+  {
+    "id": "pq_keyex",
+    "value": "on"
+  },
+  {
+    "id": "prefetch_preload",
+    "value": "off"
+  },
+  {
+    "id": "privacy_pass",
+    "value": "on"
+  },
+  {
+    "id": "proxy_read_timeout",
+    "value": "125"
+  },
+  {
+    "id": "pseudo_ipv4",
+    "value": "off"
+  },
+  {
+    "id": "replace_insecure_js",
+    "value": "on"
+  },
+  {
+    "id": "response_buffering",
+    "value": "off"
+  },
+  {
+    "id": "rocket_loader",
+    "value": "off"
+  },
+  {
+    "id": "security_header",
+    "value": {
+      "strict_transport_security": {
+        "enabled": false,
+        "max_age": 0,
+        "include_subdomains": false,
+        "preload": false,
+        "nosniff": false
+      }
+    }
+  },
+  {
+    "id": "security_level",
+    "value": "medium"
+  },
+  {
+    "id": "server_side_exclude",
+    "value": "on"
+  },
+  {
+    "id": "sort_query_string_for_cache",
+    "value": "off"
+  },
+  {
+    "id": "ssl",
+    "value": "full"
+  },
+  {
+    "id": "tls_1_2_only",
+    "value": "off"
+  },
+  {
+    "id": "tls_1_3",
+    "value": "zrt"
+  },
+  {
+    "id": "tls_client_auth",
+    "value": "off"
+  },
+  {
+    "id": "true_client_ip_header",
+    "value": "off"
+  },
+  {
+    "id": "visitor_ip",
+    "value": "on"
+  },
+  {
+    "id": "waf",
+    "value": "off"
+  },
+  {
+    "id": "webp",
+    "value": "off"
+  },
+  {
+    "id": "websockets",
+    "value": "on"
+  }
+]
