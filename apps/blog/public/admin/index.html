@@ -6,6 +6,29 @@
     <meta name="robots" content="noindex" />
     <title>記事の管理</title>
     <link rel="icon" href="/favicon.ico" />
+    <style>
+      /*
+        記事の編集画面の配置。タイトル・下書き・カテゴリ・公開日時・URL を小さくまとめ、本文を広く取る。
+        Sveltia CMS が項目に付ける data-key-path（config.yml の name）を目印にしている。
+        Sveltia CMS を更新したときは、編集画面の見た目が崩れていないか確かめる。
+      */
+      .content:has(> section.field[data-key-path='Title']):has(> section.field[data-key-path='body']) {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        align-content: start;
+      }
+      .content > section.field[data-key-path='Title'] { grid-column: span 4; }
+      .content > section.field[data-key-path='Draft'] { grid-column: span 2; }
+      .content > section.field[data-key-path='Category'],
+      .content > section.field[data-key-path='Date'] { grid-column: span 3; }
+      .content > section.field[data-key-path='URL'],
+      .content > section.field[data-key-path='body'] { grid-column: span 6; }
+      /* 下書きのない（はてなブログ時代の）記事は、タイトルを一行使う */
+      .content:not(:has(> section.field[data-key-path='Draft'])) > section.field[data-key-path='Title'] {
+        grid-column: span 6;
+      }
+      .content > section.field[data-key-path='body'] .auto-resize { min-height: 65vh; }
+    </style>
   </head>
   <body>
     <!--
