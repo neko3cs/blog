@@ -91,7 +91,15 @@ Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records で、
 | --- | --- | --- | --- | --- |
 | CNAME | `blog` | `hatenablog.com` | オン | #14 が終わるまでの状態。プロキシをオンにしたこのレコードに、Worker のルート `blog.neko3cs.net/*` が掛かる |
 
-`neko3cs.net` には、ブログ以外のレコード（ポートフォリオサイト、Search Console の所有権確認の TXT など）もあります。失ったときは、Search Console の「ドメイン」プロパティを開き、所有権の確認で表示される TXT レコードを入れ直してください。
+`nslookup -type=TXT neko3cs.net` で確認できた、ルート（`neko3cs.net`）の TXT レコードは次の3つです（2026-11-24 時点。公開されている値です）。
+
+| 種類 | 名前 | 内容 | 用途 |
+| --- | --- | --- | --- |
+| TXT | `neko3cs.net` | `v=spf1 -all` | このドメインからはメールを送らない（SPF） |
+| TXT | `neko3cs.net` | `google-site-verification=OxRcB5XmaSQ8_UyO6AA3Ngv_od8ARPTGaKrbaLNUPmk` | Search Console の「ドメイン」プロパティの所有権確認 |
+| TXT | `neko3cs.net` | `openai-domain-verification=dv-IMMDPC9OWgFSTzs9HQyYQ6FK` | OpenAI のドメイン確認 |
+
+このほかに、ポートフォリオサイトなどのレコードもあります。この表は、問い合わせで分かった範囲だけです。レコードの一覧は、Cloudflare の画面か API でないと分からないので、書き出しができたら、そちらを正にします。Search Console の TXT は、「ドメイン」プロパティの所有権の確認で、新しい値が表示されることもあります。
 
 > `blog` のレコードのプロキシがオフだと、Worker のルートが効きません。作り直したあとは、オレンジの雲（プロキシ オン）になっているかを確かめます。
 
