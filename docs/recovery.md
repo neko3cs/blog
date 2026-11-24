@@ -2,7 +2,9 @@
 
 Cloudflare や GitHub の設定を失ったとき（誤って消した、アカウントの問題、別のアカウントで作り直すなど）に、この手順書を見て元の環境を作り直すためのものです（Issue #24）。
 
-Terraform などの IaC は使っていません。今の規模では、管理の手間のほうが大きいためです。代わりに、この手順書と、設定の書き出し（`docs/recovery/`）で補います。リソースが増える、複数のサイトで同じ構成を作る、他の人と共同で変更する、といった状況になったら、IaC を再検討します。
+Terraform などの IaC は使っていません。今の規模では、管理の手間のほうが大きいためです。代わりに、この手順書と、設定の書き出し（`docs/recovery/`）で補います。リソースが増える、複数のサイトで同じ構成を作る、他の人と共同で変更する、といった状況になったら、IaC を再検討します。Cloudflare のゾーンと `main` のルールセットを IaC にする計画は、#30 にあります（#14 の後）。
+
+調査から復旧まで、Claude などのエージェントに任せることを想定しています。そのため、画面の操作に頼らず、API とコマンドで再現できるように、設定は機械で読める形（JSON、BIND 形式）で書き出して置きます（6）。値を入力する操作（シークレット、2段階認証、ログイン）は、人が行います。
 
 ## 1. 何が Git にあり、何がないか
 
@@ -13,7 +15,7 @@ Terraform などの IaC は使っていません。今の規模では、管理�
 | 管理画面の設定（`apps/blog/public/admin/`） | Git | 同上 |
 | 動いている Worker のバージョン | Cloudflare | バージョン履歴から戻せる（2.2） |
 | DNS のレコード | Cloudflare（書き出しは `docs/recovery/`。**未了**、下記の注意を参照） | 作り直す（3.2） |
-| ゾーンの設定（Always Use HTTPS、ルート・`www` から `portfolio` へのリダイレクトのルール） | Cloudflare（書き出しなし） | 画面で作り直す（3.2.1） |
+| ゾーンの設定（Always Use HTTPS、ルート・`www` から `portfolio` へのリダイレクトのルール） | Cloudflare（書き出しは `docs/recovery/`。**未了**、6 の手順で置く） | 書き出しがあれば API で戻す。なければ画面で作り直す（3.2.1） |
 | ドメインの登録先（レジストラ）とそのログイン | レジストラ | 作り直せない。ネームサーバーを Cloudflare に向ける操作ができなくなるので、登録先とログインを控えておく（下記） |
 | Cloudflare の API トークン | Cloudflare | 作り直す（3.3） |
 | `CLOUDFLARE_API_TOKEN`、`CLOUDFLARE_ACCOUNT_ID` | GitHub の Secrets | 値は読み出せない。作り直して登録し直す（3.4） |
@@ -123,7 +125,15 @@ Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records で、
 | リダイレクトのルール | `neko3cs.net` と `www.neko3cs.net` のすべてのパスを、パスとクエリを保ったまま `https://portfolio.neko3cs.net/` へ 301 | Rules → Redirect Rules。ルールの式と、ステータスコードは、画面で確認して書き足す |
 | SSL/TLS の暗号化モード、最小の TLS バージョンなど | 未確認 | 画面を見て、既定から変えていれば、ここに書く |
 
-> **確認が必要:** この表の「未確認」の行と、リダイレクトのルールの式は、画面で確かめて埋めてください。
+> **確認が必要:** この表の「未確認」の行と、リダイレクトのルールの式は、6 の手順でゾーンの設定とルールを書き出して、確かめて埋めてください。書き出し（`docs/recovery/zone-settings.json`、`docs/recovery/redirect-rules.json`）を置いたら、この注意を消し、この節は「書き出しから戻す」手順に書き換えます。
+
+書き出しから戻すときは、API で行います（読み出しと同じ `<zone_id>` を使います）。リダイレクトのルールは、`redirect-rules.json` の `rules` を、次で置き換えます。ゾーンの設定は、`zone-settings.json` で既定と違う項目だけを、`PATCH /zones/<zone_id>/settings/<項目の id>` で戻します。どちらも書き込みなので、実行の前に、ユーザーの確認を取ります。
+
+```bash
+curl -sS -X PUT "https://api.cloudflare.com/client/v4/zones/<zone_id>/rulesets/phases/http_request_dynamic_redirect/entrypoint" \
+  -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" -H "Content-Type: application/json" \
+  --data @docs/recovery/redirect-rules.json
+```
 
 > `blog` のレコードのプロキシがオフだと、Worker のルートが効きません。作り直したあとは、オレンジの雲（プロキシ オン）になっているかを確かめます。
 
@@ -226,4 +236,31 @@ gh api repos/neko3cs/blog/rulesets --method POST --input docs/recovery/ruleset-m
 gh api repos/neko3cs/blog/rulesets/<id> --jq 'del(.id,.node_id,.created_at,.updated_at,.current_user_can_bypass,._links,.source,.source_type)' > docs/recovery/ruleset-main.json
 ```
 
-**DNS のレコード**（#14 のあとに置きます）: Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records → Export で、BIND 形式のファイルを書き出し、`docs/recovery/dns-neko3cs.net.txt` に置きます。
+**Cloudflare のゾーンの設定とルール**（DNS 以外。#14 を待たずに置けます）
+
+読み出し専用のトークンを、別に作ります。デプロイ用のトークン（3.3）には、読み出しの権限がありません。
+
+- 権限: `neko3cs.net` のゾーンだけに、Zone Settings の Read、DNS の Read、リダイレクトのルールの Read を付けます。リダイレクトのルールの権限の名前は、画面で確かめます（未確認。ルールの読み出しが `403` になったら、足りない権限を足します）。
+- 作ったトークンは、パスワードマネージャーに入れます。リポジトリには置きません。
+
+リポジトリのルートで実行します。`CLOUDFLARE_API_TOKEN` に、上の読み出し専用のトークンを入れます。
+
+```bash
+ZONE_ID=$(curl -sS "https://api.cloudflare.com/client/v4/zones?name=neko3cs.net" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result[0].id')
+
+# ゾーンの設定（SSL/TLS の暗号化モード、最小の TLS バージョン、Always Use HTTPS など）
+curl -sS "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/settings" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq '.result | sort_by(.id) | map({id, value})' > docs/recovery/zone-settings.json
+
+# リダイレクトのルール（ルート・www から portfolio へ）
+curl -sS "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/rulesets/phases/http_request_dynamic_redirect/entrypoint" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq '.result | {rules: [.rules[] | del(.id, .version, .last_updated, .ref)]}' > docs/recovery/redirect-rules.json
+```
+
+`zone-settings.json` は、全項目が入ります。既定から変えた項目を見分けにくいので、初めて置くときは、画面の SSL/TLS と見比べて、変えている項目を 3.2.1 の表に書きます。書き出しの中身に、シークレットは含まれません。コミットする前に、目で確かめます。
+
+**DNS のレコード**（#14 のあとに置きます）
+
+```bash
+curl -sS "https://api.cloudflare.com/client/v4/zones/$ZONE_ID/dns_records/export" -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" > docs/recovery/dns-neko3cs.net.txt
+```
+
+画面で書き出すときは、Cloudflare のダッシュボード → `neko3cs.net` → DNS → Records → Export で、BIND 形式のファイルを書き出し、同じ場所に置きます。
