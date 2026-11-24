@@ -3,8 +3,17 @@
   "configurations": [
     {
       "name": "blog-preview",
-      "runtimeExecutable": "./node_modules/.bin/wrangler",
-      "runtimeArgs": ["dev", "--port", "8787", "--ip", "127.0.0.1"],
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "apps/blog/node_modules/wrangler/bin/wrangler.js",
+        "dev",
+        "--config",
+        "apps/blog/wrangler.jsonc",
+        "--port",
+        "8787",
+        "--ip",
+        "127.0.0.1"
+      ],
       "port": 8787
     }
   ]

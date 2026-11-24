@@ -1,5 +1,5 @@
 {
-  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "$schema": "node_modules/wrangler/config-schema.json",
   // 記事の管理画面（Sveltia CMS）の GitHub ログインの受け口（Issue #20）。ブログ本体の Worker とは別に配信する
   "name": "neko3cs-blog-cms-auth",
   "main": "src/index.js",

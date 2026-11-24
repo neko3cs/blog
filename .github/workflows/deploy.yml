@@ -35,16 +35,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # 管理画面（Sveltia CMS）で書いた記事の入力ミスを、公開する前に見つける（Issue #20）
-      - run: pnpm check:frontmatter
+      - run: pnpm --filter blog check:frontmatter
 
-      - run: pnpm test:cms-auth
+      - run: pnpm --filter cms-auth test
 
-      - run: pnpm build
+      - run: pnpm --filter blog build
 
       # PR ではここまで（検査とビルドが通ること）だけを確かめる。Secrets は使わない
       - name: Deploy to Cloudflare Workers
         if: github.event_name != 'pull_request'
-        run: pnpm exec wrangler deploy
+        run: pnpm --filter blog exec wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -52,7 +52,7 @@ jobs:
       # 管理画面の GitHub ログインの受け口。GITHUB_CLIENT_ID と GITHUB_CLIENT_SECRET は Worker の Secret に登録済みのものを使う
       - name: Deploy the CMS auth worker
         if: github.event_name != 'pull_request'
-        run: pnpm exec wrangler deploy --config workers/cms-auth/wrangler.jsonc
+        run: pnpm --filter cms-auth exec wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
