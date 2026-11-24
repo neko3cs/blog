@@ -9,7 +9,7 @@
 
 # 記事の管理画面（Sveltia CMS、Issue #20）。検索に載せず、他のサイトに埋め込まれないようにする。
 # 読み込み先は、Sveltia CMS の配布元（unpkg.com）、そのフォント（cdn.jsdelivr.net）、
-# GitHub の API・ステータス、OAuth の受け口（workers/cms-auth）だけに絞る。
+# GitHub の API・ステータス、OAuth の受け口（apps/cms-auth）だけに絞る。
 /admin
   X-Robots-Tag: noindex
 /admin/*

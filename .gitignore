@@ -164,8 +164,8 @@ vite.config.ts.timestamp-*
 # Cloudflare Wrangler
 .wrangler/
 
-# はてなブログから取得した HTML（scripts/import-hatena.mjs のキャッシュ）
-migration/.cache/
+# はてなブログから取得した HTML（apps/blog/scripts/import-hatena.mjs のキャッシュ）
+apps/blog/migration/.cache/
 
-# Cloudflare Workers のローカル実行用の環境変数（workers/cms-auth）
+# Cloudflare Workers のローカル実行用の環境変数（apps/cms-auth）
 .dev.vars

@@ -2,6 +2,8 @@
 
 `https://blog.neko3cs.net/` を、URL を一切変えずにはてなブログProから自作の静的サイト（Cloudflare）へ引っ越すための計画です。
 
+> **注:** 2026-11 にリポジトリをモノレポにし（Issue #25）、ブログ本体を `apps/blog/`、認証 Worker を `apps/cms-auth/` に移しました。本文のファイルのパスは、移動後の場所に直しています。`pnpm` のコマンドは当時の記録のままなので、今は `pnpm --filter blog <スクリプト>` で実行します（`pnpm build` などルートにあるものは、そのまま実行できます）。
+
 ## 1. 結論
 
 **URL を完全に維持したまま移行できます。** 理由は次の2点です。
@@ -41,7 +43,7 @@
 | --- | --- | --- |
 | SSG | **Analog 2.9（Angular 22）**（採用） | 作者が Angular を好んで書いており、技術者ブログとして「Angular で作ったブログ」であることに意味があるため。Astro と同じ記事ページを試作して比較したうえで決定した（3.1 参照） |
 | ホスティング | **Cloudflare Workers (Static Assets)** | 静的ファイルだけを配信する。無料枠に収まる |
-| 画像 | リポジトリ同梱（`public/images/`）または R2 | 98記事分なら同梱で十分。容量が大きくなったら R2 |
+| 画像 | リポジトリ同梱（`apps/blog/public/images/`）または R2 | 98記事分なら同梱で十分。容量が大きくなったら R2 |
 | ソース管理 | このリポジトリ（`neko3cs/blog`） | GitHub Actions で main への push 時に自動デプロイ（#21） |
 
 ### 3.1 SSG の選定（Astro と Analog の比較）
@@ -78,13 +80,13 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 | 注意点 | 対応 |
 | --- | --- |
-| `src/content/` 以下の Markdown は、同じパスのルートとして自動登録され、自作の `/entry/**` ページより優先される | 記事は `content/entry/` に置く。ファイルパスを はてなのURLパスと一致させる（blogsync の出力構造と同じ） |
+| `apps/blog/src/content/` 以下の Markdown は、同じパスのルートとして自動登録され、自作の `/entry/**` ページより優先される | 記事は `apps/blog/content/entry/` に置く。ファイルパスを はてなのURLパスと一致させる（blogsync の出力構造と同じ） |
 | catch-all ルート（`[...path].page.ts`）は親子2段のルートとして登録され、ページ自身の `ActivatedRoute` からは URL のパスが取れない | `ActivatedRoute.pathFromRoot` のすべての URL 断片を連結する |
 | Analog 2.9 は Markdown の変換とハイライトをビルド時に行い、実行時の `ContentRenderer` は何もしない。`MarkdownComponent` に Markdown を渡すと、変換前のテキストがそのまま出力される | `import.meta.glob` で `?analog-content-file=true` を付けて読み込み、ビルド時に変換済みの HTML を受け取る |
 | プリレンダーは非同期の読み込みを待たない場合がある | 記事の読み込みを `PendingTasks.run()` で包む |
 | 記事本文までハイドレーションすると、Markdown 処理や Shiki の JS（約 540KB）がブラウザに送られる | 記事を `@defer (hydrate never)` で囲み、ブラウザでは再実行しない（`withIncrementalHydration()` が必要） |
 | `format: 'file'` 相当の出力では、canonical に `.html` が付く恐れがある（Astro の試作で発生） | canonical は記事のパスから組み立て、ビルド時の URL には頼らない |
-| `prerender.routes` の `contentDir` は、既定でサブフォルダを探さない。日付形式の記事（`entry/2020/03/30/002449`）が漏れる | 記事を読み込んでプリレンダーするルートを自分で列挙する（`src/server/entries.ts`） |
+| `prerender.routes` の `contentDir` は、既定でサブフォルダを探さない。日付形式の記事（`entry/2020/03/30/002449`）が漏れる | 記事を読み込んでプリレンダーするルートを自分で列挙する（`apps/blog/src/server/entries.ts`） |
 | `@defer` で囲む部品と同じ `import` 文で型も読み込むと、その部品が遅延読み込みの対象から外れ、ブラウザに送られる | 型は `import type` で分けて読み込む |
 | 404 ページはどのURLでも同じ HTML が返るため、ブラウザで Angular を起動するとハイドレーションが合わない | `postRenderingHooks` で 404.html から JS の読み込みを取り除く |
 | Nitro は「#」などをエンコードしたままのファイル名（`C%23.html`）で書き出すが、Cloudflare はデコードした名前（`C#.html`）を探す | `postRenderingHooks` でファイル名をデコードしてから書き出す |
@@ -122,7 +124,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 取得漏れがないことは、sitemap（98件）と、はてなの記事一覧ページ（`/archive?page=N`、98件）を照合して確認した。about ページの「ブログ投稿数 98 記事」とも一致する。
 
-`pnpm import:hatena`（`scripts/import-hatena.mjs`）が、`migration/baseline.csv` の全記事の HTML を取得し（`migration/.cache/html/` に保存。Git の管理外）、`content/entry/<URLのパス>.md` に書き出す。frontmatter は blogsync と同じ形式（`Title`・`Category`・`Date`・`URL`）。
+`pnpm import:hatena`（`apps/blog/scripts/import-hatena.mjs`）が、`apps/blog/migration/baseline.csv` の全記事の HTML を取得し（`apps/blog/migration/.cache/html/` に保存。Git の管理外）、`apps/blog/content/entry/<URLのパス>.md` に書き出す。frontmatter は blogsync と同じ形式（`Title`・`Category`・`Date`・`URL`）。
 
 ### 5.2 変換の規則
 
@@ -130,7 +132,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | --- | --- |
 | はてなキーワードの自動リンク | 文字だけ残す |
 | コードブロック（`pre.code`） | 言語付きのコードブロック。言語名は Shiki の名前に揃える（`sh`→`shellscript` など） |
-| フォトライフの画像 | ダウンロードして `public/images/<日付>/` に置く。キャプション付き（`figure`）は HTML の `figure` で残す |
+| フォトライフの画像 | ダウンロードして `apps/blog/public/images/<日付>/` に置く。キャプション付き（`figure`）は HTML の `figure` で残す |
 | はてなのリンクカード | 記事タイトル付きのリンク。直後の引用元表記（`hatena-citation`）は取り除く |
 | SlideShare・Speaker Deck | iframe のまま残し、元の縦横比を `aspect-ratio` で指定する |
 | X（Twitter）の埋め込み | 引用（blockquote）として本文を残す。読み込み用のスクリプトは取り除く |
@@ -143,13 +145,13 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 | 太字・斜体 | 内側の端が記号のときは HTML の `<strong>`・`<em>` にする（Markdown の仕様では `**『…』**です` が太字にならないため） |
 | タイトル | 前後の空白も残す（末尾に空白のある記事があり、はてなの title と完全に一致させるため） |
 
-`pnpm check:content`（`scripts/check-content.mjs`）で、**はてなの本文の文がすべて新サイトの本文にあるか**を全記事で照合する（98記事で見つからない文 0件を確認済み）。
+`pnpm check:content`（`apps/blog/scripts/check-content.mjs`）で、**はてなの本文の文がすべて新サイトの本文にあるか**を全記事で照合する（98記事で見つからない文 0件を確認済み）。
 
 ### 5.3 画像
 
-1. 本文のフォトライフの画像（91枚、約11MB）をダウンロードし、`public/images/YYYYMMDD/<id>.<ext>` に置いた（対応済み）
+1. 本文のフォトライフの画像（91枚、約11MB）をダウンロードし、`apps/blog/public/images/YYYYMMDD/<id>.<ext>` に置いた（対応済み）
 2. Zenn など外部に置いた画像（3枚）は、元のURLのまま参照する
-3. はてなが生成していた OGP 画像の代わりに、記事ごとの OGP 画像をビルド時に生成する（対応済み。`scripts/generate-og-images.mjs` が satori と resvg で `/og/entry/<記事のパス>.png` を作る。それ以外のページは共通の `/og/default.png`）
+3. はてなが生成していた OGP 画像の代わりに、記事ごとの OGP 画像をビルド時に生成する（対応済み。`apps/blog/scripts/generate-og-images.mjs` が satori と resvg で `/og/entry/<記事のパス>.png` を作る。それ以外のページは共通の `/og/default.png`）
 
 ### 5.4 SEO メタ情報の引き継ぎ
 
@@ -169,8 +171,8 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ### Phase 0: 棚卸し（ベースラインの記録）
 
-- [x] sitemap の全URLと `/archive`、`/feed`、`/rss` の計103件について、ステータス・title・canonical を `migration/baseline.csv` に記録する（`pnpm baseline`。2026-11-22 に記録、すべて 200）
-- [x] Search Console で流入の多い上位ページを確認し、重点確認リストを作る（`migration/search-console-pages.csv`。直近12か月の97件。クリックの約7割が `/entry/work-with-depression-2-times-2026` に集中）
+- [x] sitemap の全URLと `/archive`、`/feed`、`/rss` の計103件について、ステータス・title・canonical を `apps/blog/migration/baseline.csv` に記録する（`pnpm baseline`。2026-11-22 に記録、すべて 200）
+- [x] Search Console で流入の多い上位ページを確認し、重点確認リストを作る（`apps/blog/migration/search-console-pages.csv`。直近12か月の97件。クリックの約7割が `/entry/work-with-depression-2-times-2026` に集中）
 - [x] Search Console のプロパティと所有権の確認方法を確認する（「ドメイン」プロパティ `blog.neko3cs.net` を DNS で確認済み。切り替えの対応は不要）
 - [ ] MT 形式のエクスポートを取得し、バックアップとして保存する（今は不要。はてなのアカウントを残すあいだは、はてなの管理画面に原稿・下書き・コメントが残る。**はてなブログやアカウントを削除する前**に取る）
 
@@ -178,7 +180,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 - [x] 全98記事の公開ページの HTML を取得する（`pnpm import:hatena`）
 - [x] 変換スクリプトで Markdown に変換し、画像をダウンロードする
-- [x] `content/entry/<URLのパス>.md` として配置する
+- [x] `apps/blog/content/entry/<URLのパス>.md` として配置する
 - [x] 本文の文章が欠けていないことを照合する（`pnpm check:content`。見つからない文 0件）
 - [x] はてなの全URL（103件）が新サイトでも一致することを確認する（`pnpm check:urls`。title・canonical まで一致）
 - [x] 全ページ（329件）がスマホ幅で横にはみ出さないことを確認する
@@ -194,7 +196,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 ### Phase 3: 検証（切り替え前）
 
-- [x] **URL 検証スクリプト**（`pnpm check:urls <URL>`）: `migration/baseline.csv` の全パスを `*.workers.dev` に投げて、次の5点を確認する（2026-11-23、103件すべて一致）
+- [x] **URL 検証スクリプト**（`pnpm check:urls <URL>`）: `apps/blog/migration/baseline.csv` の全パスを `*.workers.dev` に投げて、次の5点を確認する（2026-11-23、103件すべて一致）
   - ステータスが 200 であること（301/308/404 は不合格）
   - 最終URLのパスが元と完全に一致すること
   - `canonical` が `https://blog.neko3cs.net/<同じパス>` であること
@@ -205,7 +207,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
   - Search Console の流入上位7記事: 画像（計5枚）がすべて 200 で表示され、コードブロックは Shiki でハイライトされ、Markdown の記号が本文に残っていない
   - Speaker Deck の埋め込みとリンクカードのある記事（`join-report-of-codeer-lowcode-blazor`）: 埋め込みが 16:9 で表示される
   - 流入1位の `work-with-depression-2-times-2026`: スマホ幅（375px）で横にはみ出さない
-- [x] プレビュー環境は `noindex` にして、重複コンテンツとしてクロールされないようにする（`public/_headers` で `*.workers.dev` のホストにだけ `X-Robots-Tag: noindex` を付ける。本番のホストには付かないので、切り替え時に外す作業はない）
+- [x] プレビュー環境は `noindex` にして、重複コンテンツとしてクロールされないようにする（`apps/blog/public/_headers` で `*.workers.dev` のホストにだけ `X-Robots-Tag: noindex` を付ける。本番のホストには付かないので、切り替え時に外す作業はない）
 - [x] Google のリッチリザルトテストで、記事ページの構造化データを確認する（2026-11-23、本番の `work-with-depression-2-times-2026` で「記事」と「パンくずリスト」が1件ずつ有効）
 
 > Node の `fetch` はプロキシの環境変数を見ないため、プロキシ越しに検証するときは `NODE_USE_ENV_PROXY=1 pnpm check:urls <URL>` とする。
@@ -214,7 +216,7 @@ Analog（Nitro）のプリレンダー設定 `prerender.autoSubfolderIndex: fals
 
 2026-11-23 に切り替えた。CNAME を削除してカスタムドメインを追加する方法だと、証明書の発行まで一時的につながらなくなる恐れがある。そのため、**既存の CNAME のプロキシをオンにし、Worker のルートで受ける方法**にした。`*.neko3cs.net` の証明書はすでにあるので、つながらない時間が出ない。
 
-1. [x] `wrangler.jsonc` に `blog.neko3cs.net/*` のルートを追加してデプロイする（プロキシがオフのあいだは効かない。はてなが応答し続けることを確認した）
+1. [x] `apps/blog/wrangler.jsonc` に `blog.neko3cs.net/*` のルートを追加してデプロイする（プロキシがオフのあいだは効かない。はてなが応答し続けることを確認した）
 2. [x] Cloudflare ダッシュボードで、`blog` の CNAME（→ `hatenablog.com`）の **Proxy status をオン**にする。この時点から Worker が応答する
 3. [x] 本番ドメインに対して Phase 3 の検証スクリプトを再実行する（`pnpm check:urls https://blog.neko3cs.net`。103件すべて一致）
 4. [x] プレビュー用の `noindex` が本番に残っていないことを確認する（3. の検証スクリプトで確認した）
